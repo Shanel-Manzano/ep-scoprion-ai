@@ -1,0 +1,19 @@
+{
+  "name": "aimax-signup-prototype",
+  "version": "1.0.0",
+  "description": "AI MAX sign up, launch and onboarding prototype",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node build.mjs && npx --yes http-server dist -p 4173 -c-1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "private": true
+}
