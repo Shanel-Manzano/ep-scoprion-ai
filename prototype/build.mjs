@@ -14,4 +14,5 @@ await build({
 });
 cpSync('public/fonts', 'dist/fonts', { recursive: true });
 copyFileSync('public/scorpion-logomark.svg', 'dist/scorpion-logomark.svg');
+copyFileSync('public/michelle.jpg', 'dist/michelle.jpg');
 copyFileSync('index.html', 'dist/index.html');

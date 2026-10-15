@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef } from 'react';
 import { Icon } from './Icons.jsx';
 import { useApp } from '../store.jsx';
+import { PM, HELP } from '../data.js';
 
 export function Head({ eyebrow, title, lede, children }) {
   return (
@@ -115,4 +116,22 @@ export function useHeadingFocus(dep) {
     const h = document.querySelector('[data-heading]');
     if (h) h.focus({ preventScroll: true });
   }, [dep]);
+}
+
+// The real person behind the product, so nobody feels they are talking to a form.
+export function Person({ line, compact }) {
+  return (
+    <div className={'person' + (compact ? ' person--compact' : '')}>
+      <span className="person__av"><img src={PM.photo} alt="" width="56" height="56" /><i aria-label="Online" /></span>
+      <div className="person__txt">
+        <b>{PM.name}</b>
+        <span>{line || PM.role}</span>
+        <span className="person__ph"><Icon name="phone" size={14} /> {HELP.phone}</span>
+      </div>
+    </div>
+  );
+}
+
+export function Kicker({ children }) {
+  return <div className="kicker"><span className="kicker__mark" aria-hidden="true" />{children}</div>;
 }

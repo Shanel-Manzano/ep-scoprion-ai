@@ -52,6 +52,7 @@ function Shell() {
   const dark = stage === 'signup' && view !== 'welcome';
   const tone = view === 'welcome' && stage === 'signup' ? (welcomeLight ? 'light' : 'dark') : dark ? 'dark' : 'light';
   const wide = stage === 'website' && (view === 'review' || !view);
+  const bleed = stage === 'signup' && (view === 'form' || !view);
 
   useEffect(() => { document.title = 'AI MAX · Website setup'; }, []);
   useEffect(() => { document.body.style.background = tone === 'dark' ? '#0d0a1e' : '#f4f1ff'; document.body.style.transition = 'background 2.4s'; }, [tone]);
@@ -60,7 +61,7 @@ function Shell() {
     <div className="app" data-tone={tone}>
       <a className="sr" href="#main">Skip to main content</a>
       <Topbar onHelp={() => setHelp(true)} onLater={() => setLater(true)} />
-      <main id="main" className={'main' + (wide ? ' main--wide' : '')} key={stage + '/' + view}>
+      <main id="main" className={'main' + (wide ? ' main--wide' : '') + (bleed ? ' main--bleed' : '')} key={stage + '/' + view}>
         <Screen onHelp={() => setHelp(true)} />
       </main>
       <Toast />

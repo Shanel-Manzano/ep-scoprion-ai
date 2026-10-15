@@ -2,7 +2,7 @@
 // the real system would supply (plan terms, prefilled business info, etc.).
 
 export const PLAN = {
-  name: 'AI MAX Website',
+  name: 'AI MAX, starting with your website',
   price: 349,
   term: '12 months',
   termMonths: 12,
@@ -16,6 +16,13 @@ export const CLIENT = {
   firm: 'The Duran Law Firm',
   site: 'duranfirm.com',
   first: 'Michael',
+};
+
+export const PM = {
+  name: 'Michelle Phares',
+  first: 'Michelle',
+  role: 'Your point of contact',
+  photo: 'michelle.jpg',
 };
 
 export const HELP = {
