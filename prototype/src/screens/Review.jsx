@@ -21,7 +21,7 @@ function findNode(canvas, label) {
 // ---------------------------------------------------------------------------
 // The scaled, scrollable website with hover highlights and numbered pins.
 // ---------------------------------------------------------------------------
-function SiteFrame({ device, site, mode, edits, selId, selLabel, onPick, onPin, focusId }) {
+function SiteFrame({ device, site, mode, edits, selId, selLabel, onPick, onPin, focusId, tools }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const scrollRef = useRef(null);
@@ -104,7 +104,10 @@ function SiteFrame({ device, site, mode, edits, selId, selLabel, onPick, onPin, 
       <div className={'browser' + (phone ? ' browser--phone' : '')} style={{ width: frameW }}>
         <div className="browser__chrome">
           {!phone && <div className="browser__dots"><i /><i /><i /></div>}
-          <div className="browser__url"><Icon name="eye" size={14} /> Preview · <b>{CLIENT.site}</b></div>
+          {isEdit
+            ? <div className="browser__edit"><span className="dot" /><b>Edit mode</b><span>Click a headline or photo to leave a note</span></div>
+            : <div className="browser__url"><Icon name="eye" size={14} /> Preview · <b>{CLIENT.site}</b></div>}
+          {tools && <div className="browser__tools">{tools}</div>}
         </div>
         <div className="browser__scroll" ref={scrollRef} style={{ height: viewH }}>
           <div className="sizer" style={{ width: base * scale, height: ch * scale }}>
@@ -343,7 +346,7 @@ export function Review() {
   const says = justRevised ? 'Your edits are done. Take a look, and if it’s right, choose Looks good.'
     : blocked ? 'I’m working on your edits. I’ll email you the moment they’re ready.'
     : ds.length ? 'Ready? Send your edits and I’ll get started.'
-    : 'Click anything you’d like changed. I’ll take it from there.';
+    : 'Click anything you’d like changed. If it’s all right, choose Looks Good, Approve at the top.';
 
   return (
     <div className="screen review">
@@ -353,7 +356,7 @@ export function Review() {
             <div className="eyebrow">Step 3 of 4 · Website · Version {s.siteVersion}</div>
             <h1 className="h1" tabIndex={-1} data-heading>Review your website.</h1>
             <p className="rv__ask">
-              <b>Click anything you want changed.</b> Or if it looks right, choose Looks good.
+              <b>Click anything you want changed.</b> Or if it looks right, approve it.
               <span className="tipwrap">
                 <button className="tipbtn" onClick={() => setTip(!tip)} aria-expanded={tip} aria-label="What should I look for?"><Icon name="info" size={16} /> What to look for</button>
                 {tip && (
@@ -368,10 +371,7 @@ export function Review() {
             </p>
             {statusText && <p className="rv__status">{statusText}</p>}
           </div>
-          <div className="rv__ctl">
-            {devSeg}
-            <button className="btn btn--soft btn--sm" onClick={() => setDrawer(true)}><Icon name="edit" size={17} /> My edits <span className="badge badge--solid">{live.length}</span></button>
-          </div>
+          <button className="btn btn--primary btn--lg rv__approve" disabled={blocked} onClick={approve}><Icon name="check" size={20} stroke={3} /> Looks Good, Approve</button>
         </div>
 
         {s.flags.updatedBanner && s.changes.length > 0 && (
@@ -383,8 +383,8 @@ export function Review() {
 
         <div className="stagebox is-edit">
           <SiteFrame device={device} site={site} mode={mode} edits={s.edits} selId={draft ? draft.id : selId} selLabel={draft ? draft.label : (s.edits.find((e) => e.id === selId) || {}).label} focusId={focusId}
-            onPick={pick} onPin={openPin} />
-          {!draft && <div className="editpill" aria-hidden="true"><span className="dot" /><b>Edit mode</b><span>Click a headline or photo to leave a note</span></div>}
+            onPick={pick} onPin={openPin} tools={<>{devSeg}<button className="btn btn--soft btn--xs" onClick={() => setDrawer(true)}><Icon name="edit" size={15} /> My edits <span className="badge badge--solid">{live.length}</span></button></>} />
+}
         </div>
       </div>
 
@@ -410,8 +410,8 @@ export function Review() {
           <img className="says__av" src={PM.photo} alt="" width="44" height="44" />
           <div><span className="says__k">{PM.first} says</span><div className="says__t">{says}</div></div>
         </div>}>
-        {ds.length > 0 && <button className="btn btn--tint" onClick={() => go({ stage: 'website', view: 'send' })}><Icon name="send" size={18} /> Send {ds.length} edit{ds.length === 1 ? '' : 's'}</button>}
-        <button className="btn btn--primary btn--lg" disabled={blocked} onClick={approve}><Icon name="check" size={20} stroke={3} /> Looks good</button>
+        {ds.length > 0 && <button className="btn btn--primary btn--lg" onClick={() => go({ stage: 'website', view: 'send' })}><Icon name="send" size={18} /> Send {ds.length} edit{ds.length === 1 ? '' : 's'}</button>}
+        {ds.length > 0 && <span className="hide-sm" />}
       </ActionBar>
     </div>
   );

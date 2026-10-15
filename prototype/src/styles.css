@@ -993,3 +993,14 @@ button.chip:hover { border-color: var(--accent); }
 .actionbar .btn--lg { box-shadow: 0 10px 28px rgba(80,95,245,.34); }
 .editpill { left: auto; transform: none; }
 .editpill { display: flex; }
+.browser__edit { display: inline-flex; align-items: center; gap: 10px; padding: 5px 14px; border-radius: 999px; background: #151826; color: #fff; font-size: 13.5px; }
+.browser__edit b { font-weight: 600; }
+.browser__edit span:last-child { color: #b7c0d4; }
+.browser__edit .dot { width: 9px; height: 9px; border-radius: 50%; background: #6d8cff; animation: pulse 1.6s infinite; }
+.rv__approve { margin-left: 4px; }
+@media (max-width: 760px) { .browser__edit span:last-child { display: none; } .rv__approve { width: 100%; margin: 0; } .rv__ctl { width: 100%; } }
+.browser__tools { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.browser__tools .seg button { min-height: 32px; padding: 4px 12px; font-size: 13px; }
+.browser__chrome { height: 52px; }
+.rv__head { align-items: center; }
+@media (max-width: 760px) { .browser__tools .seg button svg { display: none; } .browser__chrome { height: auto; padding: 8px 10px; flex-wrap: wrap; } .browser__tools { margin-left: 0; width: 100%; } }
