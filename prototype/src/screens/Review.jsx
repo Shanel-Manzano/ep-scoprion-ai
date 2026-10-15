@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
+import { StatusPill, editKind } from '../ui/Status.jsx';
 import { Head, Badge, Banner, ActionBar, Modal, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import RooSite from '../site/RooSite.jsx';
 import { useApp, siteFromBiz, drafts, sent, pendingUpdate, unresolvedSent, now, rid } from '../store.jsx';
@@ -10,7 +11,7 @@ const typeMeta = (id) => REQUEST_TYPES.find((t) => t.id === id) || REQUEST_TYPES
 const STATUS = {
   draft: ['', 'Not sent yet'], received: ['', 'Received'], in_progress: ['', 'In progress'], needs_answer: ['warn', 'Needs your answer'], ready: ['good', 'Ready for review'], done: ['good', 'Done'],
 };
-export const StatusBadge = ({ status }) => { const [t, l] = STATUS[status] || STATUS.draft; return <Badge tone={t}>{l}</Badge>; };
+export const StatusBadge = ({ status }) => (status === 'draft' ? <Badge>Not sent yet</Badge> : <StatusPill kind={editKind(status)} />);
 
 function findNode(canvas, label) {
   if (!canvas) return null;

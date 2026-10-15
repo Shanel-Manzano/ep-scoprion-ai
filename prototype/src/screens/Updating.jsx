@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
 import { Head, Badge, Banner, ActionBar, Tick, Skip, Spinner, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
-import WebsiteSteps from '../ui/WebsiteSteps.jsx';
+import { StatusPill, Tracker, LaunchCard } from '../ui/Status.jsx';
 import { useApp, finishUpdate, now } from '../store.jsx';
 
 // Applying confirmed details automatically, then opening the refreshed preview.
@@ -61,12 +61,25 @@ export function Updating() {
     say('Your updated website is ready to review.');
   }
 
-  const statusOf = (c) => (c.kind === 'question' && c.status === 'pending' ? ['warn', 'Needs your answer'] : c.kind === 'team' ? ['', 'Team is working on it'] : ['', 'Being applied']);
+  // the first open item is being worked on, the rest wait their turn
+  let worked = false;
+  const kindOf = (c) => {
+    if (c.status === 'done') return 'done';
+    if (c.kind === 'question' && c.status === 'pending') return 'question';
+    if (c.kind === 'team' && worked) return 'queue';
+    worked = true; return 'progress';
+  };
+  const rows = s.changes.map((c) => ({ c, k: kindOf(c) }));
+  const hasQ = rows.some((r) => r.k === 'question');
+  const nDone = rows.filter((r) => r.k === 'done').length;
 
   return (
     <div className="screen main--narrow" style={{ margin: '0 auto' }}>
       <Head eyebrow="Step 3 of 4 · Website" title="We’re updating your website." lede="We’re applying your confirmed details before you review it. We’ll email you when it’s ready." />
-      <WebsiteSteps current={1} text="We’re getting your website ready. You’ll look it over next." version={s.siteVersion} />
+      <div className="trackcard" aria-label="Where your update stands">
+        <Tracker steps={['Details received', 'We’re updating', 'Ready to review']} current={1} alert={hasQ} />
+        <p className="trackcard__t">{hasQ ? 'We need one answer from you to keep going.' : 'We’re on it. You’ll look it over next.'}</p>
+      </div>
 
       {q && (
         <div className="card card--accent" style={{ marginBottom: 20 }} role="group" aria-label="A question from your team">
@@ -87,38 +100,31 @@ export function Updating() {
       <div className="card">
         <div className="row" style={{ justifyContent: 'space-between', marginBottom: 6 }}>
           <h2 className="h2">What we’re updating</h2>
-          <Badge icon="clock">In progress</Badge>
+          <span className="muted small">{nDone} of {rows.length} complete</span>
         </div>
         <ul className="checklist">
-          {s.changes.map((c) => {
-            const [tone, label] = statusOf(c);
-            return (
-              <li key={c.id}>
-                <Tick state={c.status === 'done' ? 'done' : tone === 'warn' ? 'warn' : 'todo'} />
-                <div className="grow">
-                  <div className="checklist__t">{c.label}</div>
-                  {(c.from || c.to) && <div className="checklist__d">{c.from ? <><s>{c.from}</s> </> : null}{c.from && c.to ? '→ ' : ''}{c.to}</div>}
-                  {c.answer && <div className="checklist__d">Your answer: {c.answer}</div>}
-                </div>
-                <Badge tone={tone}>{label}</Badge>
-              </li>
-            );
-          })}
+          {rows.map(({ c, k }) => (
+            <li key={c.id} className="chg">
+              <div className="grow">
+                <div className="checklist__t">{c.label}</div>
+                {(c.from || c.to) && <div className="checklist__d">{c.from ? <><s>{c.from}</s> </> : null}{c.from && c.to ? '→ ' : ''}{c.to}</div>}
+                {c.answer && <div className="checklist__d">Your answer: {c.answer}</div>}
+              </div>
+              <StatusPill kind={k} />
+            </li>
+          ))}
         </ul>
       </div>
 
-      <div className="banner" style={{ marginTop: 20 }}>
-        <Icon name="shield" size={22} />
-        <div><b>Nothing for you to approve yet.</b>We won’t ask you to review a draft that’s missing your confirmed details. You can finish your launch details while you wait.</div>
-      </div>
+      {!hasQ && <div style={{ marginTop: 18 }}><LaunchCard /></div>}
 
       <div className="row" style={{ marginTop: 20 }}>
         <Skip onClick={ready}>Skip ahead: updated website is ready</Skip>
         <Skip onClick={() => setMail(true)}>See the “ready” email</Skip>
       </div>
 
-      <ActionBar size="narrow" msg={<>Step 3 of 4 · <b>Website</b>. We’ll email you when it’s ready.</>}>
-        <button className="btn btn--primary" onClick={() => go({ stage: 'launch', view: 'details' })}>Complete launch details <Icon name="arrowRight" size={20} /></button>
+      <ActionBar size="narrow" msg={<>We’ll email you the moment your website is ready to review.</>}>
+        <button className="btn btn--primary" onClick={() => go({ stage: 'launch', view: 'details' })}>Complete Launch Details <Icon name="arrowRight" size={20} /></button>
       </ActionBar>
       {mail && <EmailPreview kind="ready" onClose={() => setMail(false)} onOpen={() => { setMail(false); ready(); }} />}
     </div>

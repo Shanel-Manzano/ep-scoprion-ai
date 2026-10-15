@@ -3,8 +3,9 @@ import { Icon } from '../ui/Icons.jsx';
 import { Head, Badge, Banner, ActionBar, Skip, Tick, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
 import { EditCard, StatusBadge } from './Review.jsx';
+import { Tracker, LaunchCard } from '../ui/Status.jsx';
 import WebsiteSteps from '../ui/WebsiteSteps.jsx';
-import { useApp, launchItems, drafts, sent, unresolvedSent, needsAnswer, teamEvent, now, rid, fmtTime } from '../store.jsx';
+import { useApp, drafts, sent, unresolvedSent, needsAnswer, teamEvent, now, rid, fmtTime } from '../store.jsx';
 
 // "Check your edits" before anything is sent.
 export function SendReview() {
@@ -61,22 +62,9 @@ export function SendReview() {
   );
 }
 
-const STEPS = ['Received', 'In progress', 'Ready for review'];
-function Timeline({ status }) {
+function EditTracker({ status }) {
   const idx = { received: 0, in_progress: 1, needs_answer: 1, ready: 2, done: 2 }[status] ?? 0;
-  return (
-    <div>
-      <div className="timeline" aria-hidden="true">
-        {STEPS.map((_, i) => (
-          <React.Fragment key={i}>
-            <b className={i < idx || (i === idx && status === 'ready') ? 'on' : i === idx ? 'now' : ''} />
-            {i < STEPS.length - 1 && <i className={i < idx ? 'on' : ''} />}
-          </React.Fragment>
-        ))}
-      </div>
-      <div className="tlabels" aria-hidden="true">{STEPS.map((x) => <span key={x}>{x}</span>)}</div>
-    </div>
-  );
+  return <Tracker steps={['In queue', 'In progress', 'Complete']} current={idx} alert={status === 'needs_answer'} queue={status === 'received'} allDone={status === 'ready' || status === 'done'} />;
 }
 
 function QuestionCard({ e }) {
@@ -126,8 +114,6 @@ export function Tracking() {
     <div className="screen main--narrow" style={{ margin: '0 auto' }}>
       <Head eyebrow="Step 3 of 4 · Website" title={allReady ? 'Your updated website is ready.' : 'Your team is working on your edits.'}
         lede={allReady ? 'Take another look. You can approve this version or ask for more changes.' : 'Each edit shows where it stands. If your team has a question, answer it right here.'} />
-      <WebsiteSteps current={allReady ? 4 : 3} version={s.siteVersion}
-        text={qs.length ? 'Your team needs an answer from you before they can continue.' : allReady ? 'Your edits are done. Look them over, then approve.' : 'Your team is making your edits. We’ll email you when they’re ready.'} />
 
       {s.flags.justSent && !allReady && (
         <div style={{ marginBottom: 18 }}><Banner tone="good" icon="checkCircle" title={'Received. ' + s.flags.justSent + ' edit' + (s.flags.justSent === 1 ? '' : 's') + ' sent to your team.'}>Sending edits doesn’t approve your website. You’ll approve it after you see the changes.</Banner></div>
@@ -135,20 +121,7 @@ export function Tracking() {
       {qs.length > 0 && <div style={{ marginBottom: 18 }}><Banner tone="warn" icon="message" title={qs.length === 1 ? 'Your team has a question.' : 'Your team has ' + qs.length + ' questions.'}>They’ll continue as soon as you answer. <button className="linkbtn" onClick={jumpQ}>Answer now</button></Banner></div>}
 
       <div className="stack">
-        {!allReady && qs.length === 0 && (() => {
-          const it = launchItems(s); const n = [it.calls, it.forms, it.followup, it.domain].filter(Boolean).length;
-          return (
-            <section className="launchcard">
-              <div className="launchcard__ico"><Icon name="rocket" size={26} /></div>
-              <div className="grow">
-                <h2 className="h2">While you wait, get ready to launch.</h2>
-                <p className="muted">{n} of 4 launch details done. Your website goes live as soon as you approve it.</p>
-                <div className="prog" style={{ marginTop: 10 }}><i style={{ width: (n / 4) * 100 + '%' }} /></div>
-              </div>
-              <button className="btn btn--primary" onClick={() => go({ stage: 'launch', view: 'details' })}>{n === 4 ? 'Review launch details' : 'Complete Launch Details'} <Icon name="arrowRight" size={18} /></button>
-            </section>
-          );
-        })()}
+        {!allReady && qs.length === 0 && <LaunchCard />}
         <Person line="I’m here if you have a question." />
         {qs.map((e) => <QuestionCard key={e.id} e={e} />)}
 
@@ -156,7 +129,7 @@ export function Tracking() {
         {all.map((e) => (
           <div className="card card--tight" key={e.id}>
             <EditCard e={e} />
-            <div style={{ marginTop: 14 }}><Timeline status={e.status} /></div>
+            <div style={{ marginTop: 14 }}><EditTracker status={e.status} /></div>
             {e.thread.length > 0 && e.status !== 'needs_answer' && <div className="thread">{e.thread.map((m, i) => <div key={i} className={'msg msg--' + (m.from === 'me' ? 'me' : 'team')}>{m.text}</div>)}</div>}
           </div>
         ))}
