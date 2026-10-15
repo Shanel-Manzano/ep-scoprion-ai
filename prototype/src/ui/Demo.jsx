@@ -67,8 +67,9 @@ export function Demo({ onEmail }) {
             <div className="demo__btns"><button onClick={reset}>Start over</button>{JUMPS.map(([k, l]) => <button key={k} onClick={() => jump(k)}>{l}</button>)}</div>
           </div>
           <div>
-            <h5>After “Confirm &amp; continue”</h5>
-            <div className="demo__btns">{[['auto', 'From my edits'], ['none', 'No changes'], ['apply', 'Auto-apply'], ['team', 'Team work'], ['question', 'Question']].map(([k, l]) => <button key={k} className={s.demo.scenario === k ? 'is-on' : ''} onClick={() => set('scenario', k)}>{l}</button>)}</div>
+            <h5>Next “Confirm & Continue” will</h5>
+            <div style={{ fontSize: 12.5, color: '#9b95c9', margin: '-2px 0 8px' }}>Pick one, then go to Details and confirm. Nothing changes until you do.</div>
+            <div className="demo__btns">{[['auto', 'From my edits'], ['none', 'No changes'], ['apply', 'Auto-apply'], ['team', 'Team work'], ['question', 'Question']].map(([k, l]) => <button key={k} className={s.demo.scenario === k ? 'is-on' : ''} onClick={() => { set('scenario', k); say('Set. The next time you press Confirm & Continue, this is what happens.'); }}>{l}</button>)}</div>
           </div>
           <div>
             <h5>Payment</h5>

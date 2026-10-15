@@ -175,10 +175,12 @@ function Domain() {
 }
 
 export function LaunchDetails() {
-  const { s, go } = useApp();
+  const { s, go, mut } = useApp();
   const it = launchItems(s);
   const c = s.launch;
   const [sheet, setSheet] = useState(s.flags.open || null);
+  const started = s.flags.started || {};
+  const closeSheet = () => { if (sheet) mut((d) => { d.flags.started = { ...(d.flags.started || {}), [sheet]: true }; }); setSheet(null); };
   useHeadingFocus('launch');
   const done = Object.values(it).filter(Boolean).length;
   const ready = launchDetailsDone(s);
@@ -186,16 +188,16 @@ export function LaunchDetails() {
   const domain = c.domain.choice === 'other' ? c.domain.other : c.domain.name;
 
   const cards = [
-    { key: 'calls', icon: 'phone', title: 'Calls', status: it.calls ? 'done' : 'todo',
+    { key: 'calls', icon: 'phone', title: 'Calls', status: it.calls ? 'done' : 'todo', badge: !it.calls && started.calls ? '50% complete' : undefined,
       text: it.calls ? <><b>Calls ring {c.calls.receiving}</b><div className="dim">Public number {s.biz.phone}. Tested.</div></> : <><b>Where should calls ring?</b><div className="dim">We’ll ring your phone to test it.</div></> },
-    { key: 'forms', icon: 'inbox', title: 'Form inquiries', status: it.forms ? 'done' : 'todo',
+    { key: 'forms', icon: 'inbox', title: 'Form inquiries', status: it.forms ? 'done' : 'todo', badge: !it.forms && started.forms ? '50% complete' : undefined,
       text: it.forms ? <><b>Inquiries go to {c.forms.dest}</b><div className="dim">Test delivered.</div></> : <><b>Where should inquiries go?</b><div className="dim">We’ll send a test to make sure.</div></> },
-    { key: 'followup', icon: 'calendar', title: 'Consultation follow-up', status: it.followup ? 'done' : 'todo',
+    { key: 'followup', icon: 'calendar', title: 'Consultation follow-up', status: it.followup ? 'done' : 'todo', badge: !it.followup && started.followup ? '50% complete' : undefined,
       text: it.followup ? <><b>{c.followup.mode === 'booking' ? 'Online booking' : 'Consultation requests'}</b><div className="dim">{c.followup.mode === 'booking' ? 'Calendar tested.' : 'Your team follows up by phone or email.'}</div></> : <><b>What happens after someone asks?</b><div className="dim">Choose how consultations are handled.</div></> },
     { key: 'domain', icon: 'globe', title: 'Your web address', status: it.domain ? 'done' : (c.domain.helpRequested || c.domain.status === 'waiting') ? 'warn' : 'todo',
-      badge: it.domain ? 'Done' : c.domain.helpRequested ? 'Help requested' : c.domain.status === 'waiting' ? 'Waiting' : 'To do',
+      badge: it.domain ? 'Complete' : c.domain.helpRequested ? 'Help requested' : c.domain.status === 'waiting' ? 'Waiting to connect' : started.domain ? '50% complete' : undefined,
       text: it.domain ? <><b>{domain}</b><div className="dim">Connected.</div></> : c.domain.helpRequested ? <><b>We’ll help you with this.</b><div className="dim">Your address isn’t connected yet.</div></> : c.domain.status === 'waiting' ? <><b>{domain}</b><div className="dim">Not connected yet. This can take a few hours.</div></> : <><b>{domain}</b><div className="dim">Connect it so people can find your website.</div></> },
-    { key: 'approval', icon: 'shieldCheck', title: 'Website approval', status: it.approval ? 'done' : waitingOnTeam ? 'warn' : 'todo', badge: it.approval ? 'Done' : waitingOnTeam ? 'Waiting' : 'To do',
+    { key: 'approval', icon: 'shieldCheck', title: 'Website approval', status: it.approval ? 'done' : waitingOnTeam ? 'warn' : 'todo', badge: it.approval ? 'Complete' : waitingOnTeam ? 'Waiting on your team' : undefined,
       text: it.approval ? <><b>Version {s.approval.version} approved</b><div className="dim">{fmtTime(s.approval.at)}</div></> : waitingOnTeam ? <><b>Your team is still working.</b><div className="dim">We’ll email you when you can approve.</div></> : <><b>Look over your website one more time.</b><div className="dim">Then choose Looks good.</div></> },
   ];
   const label = (st, k) => (st === 'done' ? (k === 'approval' ? 'View' : 'Change') : 'Start');
@@ -216,7 +218,7 @@ export function LaunchDetails() {
       </div>
 
       {sheet && (
-        <Sheet label="Step 4 of 4 · Launch" title={cards.find((x) => x.key === sheet).title} icon={cards.find((x) => x.key === sheet).icon} onClose={() => setSheet(null)}>
+        <Sheet label="Step 4 of 4 · Launch" title={cards.find((x) => x.key === sheet).title} icon={cards.find((x) => x.key === sheet).icon} onClose={closeSheet}>
           {sheet === 'calls' && <Calls />}
           {sheet === 'forms' && <Forms />}
           {sheet === 'followup' && <Followup />}

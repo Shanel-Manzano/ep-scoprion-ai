@@ -3,13 +3,13 @@ import { Icon } from './Icons.jsx';
 
 // Task card: icon, title, one status badge, a short summary, one clear button.
 export function TaskCard({ icon, title, status = 'todo', badge, meta, children, actions }) {
-  const label = badge || { done: 'Complete', todo: 'To do', warn: 'Action needed' }[status];
+  const label = badge || { done: 'Complete', warn: 'Action needed' }[status];
   return (
     <section className={'tcard is-' + status}>
       <header className="tcard__head">
         <span className="tcard__ico"><Icon name={icon} size={26} /></span>
         <h2 className="tcard__t">{title}</h2>
-        <span className={'tcard__pill tcard__pill--' + status}>{label}</span>
+        {label && <span className={'tcard__pill tcard__pill--' + status}>{label}</span>}
       </header>
       <div className="tcard__body">{children}</div>
       <div className="tcard__foot">
