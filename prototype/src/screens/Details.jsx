@@ -45,7 +45,7 @@ export function DetailsForm() {
     if (bad) { setOpen('loc'); setErr('Please finish the address for ' + bad.label + '.'); return; }
     if (!b.name.trim()) { setOpen('biz'); setErr('Please enter your business name.'); return; }
     if (b.locations.length > 1 && b.locations.some((l) => !l.confirmed)) { setOpen('loc'); setErr('Please confirm each location with the check box.'); return; }
-    if (!ack) { setErr('Please tick the box to confirm your details are correct.'); document.getElementById('ack')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    if (!ack) return;
     setErr('');
     const changes = diffBiz(base, b);
     const plan = planUpdate(changes, s.demo.scenario);
@@ -211,15 +211,15 @@ export function DetailsForm() {
         </Group>
       </div>
 
-      <div className="confirmbox" id="ack" style={{ marginTop: 28 }}>
-        <Check checked={ack} onChange={(e) => { setAck(e.target.checked); setErr(''); }}>
-          <b>These details are correct.</b><br /><span className="muted">We’ll use them on your website and in AI MAX. You won’t need to send them again as edits.</span>
-        </Check>
-      </div>
       {err && <div style={{ marginTop: 14 }}><Banner tone="bad" icon="alert">{err}</Banner></div>}
 
-      <ActionBar msg={<>Step 2 of 4 · <b>Details</b>. Next you review your website.</>}>
-        <button className="btn btn--primary" onClick={confirm}>{s.confirmedAt ? 'Save & continue' : 'Confirm & continue'} <Icon name="arrowRight" size={20} /></button>
+      <ActionBar msg={
+        <div className="confirmbar">
+          <Check checked={ack} onChange={(e) => { setAck(e.target.checked); setErr(''); }}>
+            <b>These details are correct.</b><span className="muted"> We’ll use them on your website and in AI MAX.</span>
+          </Check>
+        </div>}>
+        <button className="btn btn--primary" disabled={!ack} onClick={confirm}>{s.confirmedAt ? 'Save & Continue' : 'Confirm & Continue'} <Icon name="arrowRight" size={20} /></button>
       </ActionBar>
     </div>
   );
