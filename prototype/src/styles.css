@@ -548,3 +548,34 @@ button.chip:hover { border-color: var(--accent); }
 .review { gap: 12px; }
 .howbar { padding: 10px 16px; font-size: 18px; }
 @media (max-width: 760px) { .wsteps__list { grid-template-columns: 1fr 1fr; } }
+
+/* ================= task cards ================= */
+.tgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.tcard { display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 22px; background: var(--card); border: 1px solid var(--cardline); border-top: 5px solid var(--cardline); box-shadow: 0 1px 2px rgba(15,40,90,.06), 0 6px 20px var(--shadowc); min-width: 0; }
+.tcard.is-done { border-top-color: var(--good); }
+.tcard.is-warn { border-top-color: var(--warn); }
+.tcard.is-todo { border-top-color: var(--accent); }
+.tcard__head { display: flex; align-items: center; gap: 14px; }
+.tcard__ico { width: 48px; height: 48px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex: none; }
+.tcard__t { font-size: 22px; line-height: 1.2; flex: 1; min-width: 0; }
+.tcard__badge { display: inline-flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 700; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+.tcard__badge--done { background: var(--good-soft); color: var(--good); }
+.tcard__badge--todo { background: var(--accent-soft); color: var(--accent); }
+.tcard__badge--warn { background: var(--warn-soft); color: var(--warn); }
+.tcard__body { flex: 1; display: grid; gap: 4px; font-size: 19px; color: var(--ink); align-content: start; }
+.tcard__body .dim { color: var(--ink2); font-size: 17px; }
+.tcard__act { display: flex; gap: 10px; flex-wrap: wrap; }
+.progress { display: grid; gap: 10px; margin: 4px 0 26px; font-size: 19px; }
+.prog { height: 14px; background: var(--cardline); }
+.sheet { width: 600px; }
+.sheet__body { gap: 20px; padding: 24px 26px; }
+.sheet .loc { background: transparent; }
+.tgrid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.unlocks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 10px; }
+.unlock { padding: 16px; border-radius: 16px; border: 1px dashed var(--fieldline); display: grid; gap: 6px; font-size: 17px; color: var(--ink2); }
+.unlock.is-on { border: 1px solid var(--good); background: var(--good-soft); color: var(--ink); }
+.unlock b { font-size: 18px; color: var(--ink); }
+@media (max-width: 980px) { .unlocks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .tgrid, .tgrid--3, .unlocks { grid-template-columns: minmax(0, 1fr); } .sheet { width: 100%; } .tcard { padding: 20px; } }
+.wsteps { margin-bottom: 18px; }
+.review .wsteps { margin-bottom: 0; }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
 import { Head, Input, Select, Badge, Banner, ActionBar, Tick, Skip, Spinner, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
+import { TaskCard, Progress, Sheet } from '../ui/Cards.jsx';
 import ScaledSite from '../site/ScaledSite.jsx';
 import { useApp, launchItems, launchDetailsDone, publishChecks, siteFromBiz, approvalCurrent, pendingUpdate, unresolvedSent, now, fmtTime } from '../store.jsx';
 import { CLIENT } from '../data.js';
@@ -176,34 +177,54 @@ function Domain() {
 export function LaunchDetails() {
   const { s, go } = useApp();
   const it = launchItems(s);
-  const order = ['calls', 'forms', 'followup', 'domain', 'approval'];
-  const TITLES = { calls: 'Calls', forms: 'Form inquiries', followup: 'Consultation follow-up', domain: 'Your web address', approval: 'Website approval' };
-  const [openKey, setOpenKey] = useState(s.flags.open || order.find((k) => !it[k] && k !== 'approval') || '__none');
-  useHeadingFocus('launch');
-  const cur = openKey === '__none' ? null : openKey;
-  const done = Object.values(it).filter(Boolean).length;
-  const toggle = (k) => setOpenKey(cur === k ? '__none' : k);
-  const nextOf = (k) => { const n = order.find((x) => x !== k && !it[x] && x !== 'approval'); return n ? { title: TITLES[n], go: () => setOpenKey(n) } : null; };
   const c = s.launch;
+  const [sheet, setSheet] = useState(s.flags.open || null);
+  useHeadingFocus('launch');
+  const done = Object.values(it).filter(Boolean).length;
   const ready = launchDetailsDone(s);
   const waitingOnTeam = pendingUpdate(s) || unresolvedSent(s).length > 0;
+  const domain = c.domain.choice === 'other' ? c.domain.other : c.domain.name;
+
+  const cards = [
+    { key: 'calls', icon: 'phone', title: 'Calls', status: it.calls ? 'done' : 'todo',
+      text: it.calls ? <><b>Calls ring {c.calls.receiving}</b><div className="dim">Public number {s.biz.phone}. Tested.</div></> : <><b>Where should calls ring?</b><div className="dim">We’ll ring your phone to test it.</div></> },
+    { key: 'forms', icon: 'inbox', title: 'Form inquiries', status: it.forms ? 'done' : 'todo',
+      text: it.forms ? <><b>Inquiries go to {c.forms.dest}</b><div className="dim">Test delivered.</div></> : <><b>Where should inquiries go?</b><div className="dim">We’ll send a test to make sure.</div></> },
+    { key: 'followup', icon: 'calendar', title: 'Consultation follow-up', status: it.followup ? 'done' : 'todo',
+      text: it.followup ? <><b>{c.followup.mode === 'booking' ? 'Online booking' : 'Consultation requests'}</b><div className="dim">{c.followup.mode === 'booking' ? 'Calendar tested.' : 'Your team follows up by phone or email.'}</div></> : <><b>What happens after someone asks?</b><div className="dim">Choose how consultations are handled.</div></> },
+    { key: 'domain', icon: 'globe', title: 'Your web address', status: it.domain ? 'done' : (c.domain.helpRequested || c.domain.status === 'waiting') ? 'warn' : 'todo',
+      badge: it.domain ? 'Done' : c.domain.helpRequested ? 'Help requested' : c.domain.status === 'waiting' ? 'Waiting' : 'To do',
+      text: it.domain ? <><b>{domain}</b><div className="dim">Connected.</div></> : c.domain.helpRequested ? <><b>We’ll help you with this.</b><div className="dim">Your address isn’t connected yet.</div></> : c.domain.status === 'waiting' ? <><b>{domain}</b><div className="dim">Not connected yet. This can take a few hours.</div></> : <><b>{domain}</b><div className="dim">Connect it so people can find your website.</div></> },
+    { key: 'approval', icon: 'shieldCheck', title: 'Website approval', status: it.approval ? 'done' : waitingOnTeam ? 'warn' : 'todo', badge: it.approval ? 'Done' : waitingOnTeam ? 'Waiting' : 'To do',
+      text: it.approval ? <><b>Version {s.approval.version} approved</b><div className="dim">{fmtTime(s.approval.at)}</div></> : waitingOnTeam ? <><b>Your team is still working.</b><div className="dim">We’ll email you when you can approve.</div></> : <><b>Look over your website one more time.</b><div className="dim">Then choose Looks good.</div></> },
+  ];
+  const label = (st, k) => (st === 'done' ? (k === 'approval' ? 'View' : 'Change') : 'Start');
 
   return (
-    <div className="screen main--narrow" style={{ margin: '0 auto' }}>
-      <Head eyebrow="Step 4 of 4 · Launch" title="Get ready to launch." lede="A few quick checks so calls and inquiries reach you the moment your website is live.">
-        <div style={{ marginTop: 18 }}><div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}><b>{done} of 5 done</b></div><div className="prog" role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={5}><i style={{ width: (done / 5) * 100 + '%' }} /></div></div>
-      </Head>
-      <div className="acc">
-        <Item id="calls" title="Calls" done={it.calls} summary={'Calls to ' + s.biz.phone + ' ring ' + c.calls.receiving + '. Tested.'} open={cur === 'calls'} onToggle={() => toggle('calls')} next={nextOf('calls')}><Calls /></Item>
-        <Item id="forms" title="Form inquiries" done={it.forms} summary={'Inquiries go to ' + c.forms.dest + '. Tested.'} open={cur === 'forms'} onToggle={() => toggle('forms')} next={nextOf('forms')}><Forms /></Item>
-        <Item id="followup" title="Consultation follow-up" done={it.followup} summary={c.followup.mode === 'booking' ? 'Online booking, calendar tested.' : 'Visitors send a consultation request. Your team follows up.'} open={cur === 'followup'} onToggle={() => toggle('followup')} next={nextOf('followup')}><Followup /></Item>
-        <Item id="domain" title="Your web address" done={it.domain} summary={(c.domain.choice === 'other' ? c.domain.other : c.domain.name) + ' is connected.'} warn={c.domain.helpRequested ? 'Help requested. Not connected yet.' : c.domain.status === 'waiting' ? 'Waiting for the connection.' : null} open={cur === 'domain'} onToggle={() => toggle('domain')} next={nextOf('domain')}><Domain /></Item>
-        <Item id="approval" title="Website approval" done={it.approval} summary={s.approval ? 'Version ' + s.approval.version + ' approved ' + fmtTime(s.approval.at) + '.' : ''} warn={waitingOnTeam ? 'Waiting on your team’s edits.' : 'Not approved yet.'} open={cur === 'approval'} onToggle={() => toggle('approval')}>
-          <p className="muted">{waitingOnTeam ? 'Your team is still working on your website. We’ll email you when you can approve it.' : 'Look over your website one more time, then choose Looks good.'}</p>
-          <div><button className="btn btn--primary" onClick={() => go({ stage: 'website', view: waitingOnTeam ? (unresolvedSent(s).length ? 'tracking' : 'updating') : 'review' })}>{waitingOnTeam ? 'See progress' : 'Review my website'} <Icon name="arrowRight" size={20} /></button></div>
-        </Item>
+    <div className="screen">
+      <Head eyebrow="Step 4 of 4 · Launch" title="Get ready to launch." lede="Five quick checks so calls and inquiries reach you the moment your website is live." />
+      <Progress done={done} total={5} label={done + ' of 5 done'} />
+      <div className="tgrid">
+        {cards.map((k) => (
+          <TaskCard key={k.key} icon={k.icon} title={k.title} status={k.status} badge={k.badge}
+            actions={<button className={'btn btn--sm ' + (k.status === 'done' ? 'btn--ghost' : 'btn--primary')}
+              onClick={() => (k.key === 'approval' ? go({ stage: 'website', view: waitingOnTeam ? (unresolvedSent(s).length ? 'tracking' : 'updating') : 'review' }) : setSheet(k.key))}>
+              {k.key === 'approval' && k.status !== 'done' ? (waitingOnTeam ? 'See progress' : 'Review website') : label(k.status, k.key)}</button>}>
+            {k.text}
+          </TaskCard>
+        ))}
       </div>
-      <ActionBar size="narrow" msg={ready ? <>Your launch details are <b>done</b>. One last look.</> : <>Step 4 of 4 · <b>Launch</b>. {4 - [it.calls, it.forms, it.followup, it.domain].filter(Boolean).length} left to finish.</>}>
+
+      {sheet && (
+        <Sheet title={cards.find((x) => x.key === sheet).title} icon={cards.find((x) => x.key === sheet).icon} onClose={() => setSheet(null)}>
+          {sheet === 'calls' && <Calls />}
+          {sheet === 'forms' && <Forms />}
+          {sheet === 'followup' && <Followup />}
+          {sheet === 'domain' && <Domain />}
+        </Sheet>
+      )}
+
+      <ActionBar msg={ready ? <>Your launch details are <b>done</b>. One last look.</> : <>Step 4 of 4 · <b>Launch</b>. {4 - [it.calls, it.forms, it.followup, it.domain].filter(Boolean).length} left to finish.</>}>
         <button className="btn btn--primary" disabled={!ready} onClick={() => go({ stage: 'launch', view: 'publish' })}>Continue <Icon name="arrowRight" size={20} /></button>
       </ActionBar>
     </div>

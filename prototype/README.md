@@ -32,16 +32,16 @@ Sign up uses the dark AI MAX look (aurora purple). When payment succeeds and the
 | 1 Signup and payment | Form, processing, welcome | `src/screens/Signup.jsx` |
 | 2 Saved progress, return links | Finish later, email previews, expired link | `src/ui/Shell.jsx`, `src/ui/Emails.jsx`, `src/screens/Links.jsx` |
 | 3 Shared layout | Top bar, help, saved status | `src/ui/Shell.jsx` |
-| 4 Confirm business details | Editable summaries, explicit confirmation | `src/screens/Details.jsx` |
+| 4 Confirm business details | Six task cards, each checked with "Looks right" or "Change" (side panel), then Confirm & Continue | `src/screens/Details.jsx` |
 | 5 Apply confirmed info | Auto-apply, team work, clarification question | `src/screens/Updating.jsx`, `diffBiz` and `planUpdate` in `src/store.jsx` |
 | 6 Review and edit | Click-to-comment on the real site, pins, browse vs leave edits | `src/screens/Review.jsx` |
 | 7 My edits and submission | Drawer, check-before-send, one optional note | `src/screens/Review.jsx`, `src/screens/Tracking.jsx` |
 | 8 Progress, questions, revisions | Per-request status, replies kept with the request | `src/screens/Tracking.jsx` |
 | 9 Website approval | Tied to the reviewed version; renewed if the version changes | `approvalCurrent` in `src/store.jsx` |
-| 10 Launch details | Calls, forms, follow-up, domain, approval | `src/screens/Launch.jsx` |
+| 10 Launch details | Five task cards with a progress bar; each opens a side panel | `src/screens/Launch.jsx` |
 | 11 Authorization and publication | Checklist, publishing, waiting, action needed, live | `src/screens/Launch.jsx` |
 | 12 Confirmation and handoff | Live preview, link, Continue to AI MAX, old-link state | `src/screens/Launch.jsx`, `src/screens/Links.jsx` |
-| 13 Self-service onboarding | Prefilled items, connect flows, business software states, revenue goal | `src/screens/Platform.jsx` |
+| 13 Self-service onboarding | Six task cards (three done from confirmation), connect flows, business software states, revenue goal | `src/screens/Platform.jsx` |
 | 14 Shared record | One state object, six milestones | `src/store.jsx` (`milestones`) |
 
 One customer record (`src/store.jsx`) backs everything, saved to `localStorage`, so a refresh or return visit resumes at the next unfinished action and never asks twice.

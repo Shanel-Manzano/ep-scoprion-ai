@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from './Icons.jsx';
 
 // One plain-language "you are here" for the whole Website step.
-const STEPS = ['Look it over', 'Send your edits', 'Your team makes them', 'Approve'];
+const STEPS = ['Look it over', 'Send edits', 'Team makes edits', 'Approve'];
 
 export default function WebsiteSteps({ current, text, version }) {
   return (

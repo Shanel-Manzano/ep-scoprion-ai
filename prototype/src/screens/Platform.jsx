@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
 import { Head, Input, Select, Badge, Banner, Tick, Modal, useHeadingFocus } from '../ui/Primitives.jsx';
+import { TaskCard, Progress, Sheet } from '../ui/Cards.jsx';
 import { useApp, platformItems, now, fmtHours, fmtTime } from '../store.jsx';
 import { SOCIALS, CRM_OPTIONS, CLIENT } from '../data.js';
 
@@ -82,14 +83,11 @@ export function Platform({ onHelp }) {
   const p = s.platform;
   const pi = platformItems(s);
   const done = Object.values(pi).filter(Boolean).length;
-  const [open, setOpen] = useState(() => ['social', 'crm', 'revenue'].find((k) => !platformItems(s)[k]) || '__none');
+  const [sheet, setSheet] = useState(null);
   const [flow, setFlow] = useState(null);
   const [otherCrm, setOtherCrm] = useState(p.crm.other);
   const [amt, setAmt] = useState(p.revenue.amount);
   useHeadingFocus('platform');
-
-  const cur = open === '__none' ? null : open;
-  const toggle = (k) => setOpen(cur === k ? '__none' : k);
 
   useEffect(() => {
     if (done === 6 && !p.doneAt) mut((d) => { d.platform.doneAt = now(); });
@@ -97,50 +95,78 @@ export function Platform({ onHelp }) {
 
   const b = s.biz, l0 = b.locations[0];
   const connectSocial = (k, acc) => { mut((d) => { d.platform[k] = { status: 'connected', account: acc }; }); setFlow(null); say('Connected.'); };
-  const crmConnect = (acc) => { mut((d) => { d.platform.crm.state = 'connected'; }); setFlow(null); say(p.crm.choice + ' is connected.'); };
-
+  const crmConnect = () => { mut((d) => { d.platform.crm.state = 'connected'; }); setFlow(null); say(p.crm.choice + ' is connected.'); };
   const crmState = p.crm.state;
-  const crmLabel = { connected: p.crm.choice + ' connected', no_software: 'You don’t use business software', other: 'Noted: ' + p.crm.other, selected: p.crm.choice + ' selected. Not connected yet', deferred: 'Decide later', none: '' }[crmState];
+  const socialCount = SOCIALS.filter((x) => ['connected', 'none'].includes(p[x.key].status)).length;
+  const crmLabel = { connected: p.crm.choice + ' is connected.', no_software: 'You don’t use business software.', other: 'Noted: ' + p.crm.other + '. Not connected.', selected: p.crm.choice + ' chosen. Not connected yet.', deferred: 'You’ll decide later.', none: 'Choose the software you use.' }[crmState];
 
-  const features = [
-    { t: 'Reviews and your Google listing', need: 'Connect Google Business Profile', on: p.google.status === 'connected', icon: 'star' },
-    { t: 'Social posts', need: 'Connect Facebook or Instagram', on: p.facebook.status === 'connected' || p.instagram.status === 'connected', icon: 'megaphone' },
-    { t: 'Inquiry tracking in your software', need: 'Connect your business software', on: crmState === 'connected', icon: 'inbox' },
-    { t: 'Progress toward your goal', need: 'Enter your revenue goal', on: p.revenue.saved, icon: 'trendingUp' },
+  const cards = [
+    { key: 'd', icon: 'briefcase', title: 'Business details', done: true, text: <><b>{b.name}</b><div className="dim">{l0.city}, {l0.state}</div></> },
+    { key: 'h', icon: 'clock', title: 'Business hours', done: true, text: <><b>Mon to Fri {fmtHours(l0.hours.weekdays)}</b><div className="dim">{l0.tz} time</div></> },
+    { key: 's', icon: 'list', title: 'What you do', done: true, text: <><b>{b.services.length} practice areas</b><div className="dim">{b.services.slice(0, 3).map((x) => x.name).join(', ')} and more</div></> },
+    { key: 'social', icon: 'mapPin', title: 'Google and social accounts', done: pi.social, warn: !pi.social && socialCount > 0, badge: pi.social ? 'Done' : socialCount ? socialCount + ' of 3' : 'To do',
+      text: <><b>{pi.social ? 'All set.' : 'Connect Google, Facebook, and Instagram.'}</b><div className="dim">{pi.social ? 'Connected or marked as not used.' : 'Connect what you use. Skip what you don’t.'}</div></> },
+    { key: 'crm', icon: 'plug', title: 'Your business software', done: pi.crm, warn: crmState === 'selected' || crmState === 'deferred', badge: pi.crm ? 'Done' : crmState === 'selected' ? 'Not connected' : crmState === 'deferred' ? 'Later' : 'To do',
+      text: <><b>{crmLabel}</b><div className="dim">Where you keep track of people who contact you.</div></> },
+    { key: 'revenue', icon: 'trendingUp', title: 'Revenue goal', done: pi.revenue,
+      text: pi.revenue ? <><b>${Number(p.revenue.amount).toLocaleString('en-US')} per {p.revenue.period}</b><div className="dim">AI MAX shows your progress toward this.</div></> : <><b>What would you like to grow toward?</b><div className="dim">Takes about a minute.</div></> },
   ];
+  const view = (k) => ['d', 'h', 's'].includes(k);
+  const features = [
+    { t: 'Reviews and your Google listing', need: 'Connect Google', on: p.google.status === 'connected' },
+    { t: 'Social posts', need: 'Connect Facebook or Instagram', on: p.facebook.status === 'connected' || p.instagram.status === 'connected' },
+    { t: 'Inquiries in your software', need: 'Connect your software', on: crmState === 'connected' },
+    { t: 'Progress toward your goal', need: 'Enter your revenue goal', on: p.revenue.saved },
+  ];
+  const open = cards.find((c) => c.key === sheet);
 
   return (
     <div className="screen">
-      <Head eyebrow="AI MAX · Your setup" title="Finish setting up AI MAX." lede="Your website is live. Connect what you use and skip what you don’t. Your progress saves as you go." />
-      {p.doneAt && <div style={{ marginBottom: 20 }}><Banner tone="good" icon="checkCircle" title="Your setup is complete.">Everything is connected or marked as not needed. Completed {fmtTime(p.doneAt)}.</Banner></div>}
-      <div className="plat">
-        <div className="setup">
-          <Item id="d" icon="briefcase" title="Business details" done doneLabel={b.name + ' · ' + l0.city + ', ' + l0.state} open={cur === 'd'} onToggle={() => toggle('d')}>
-            <p className="muted">Confirmed during launch. Nothing to do here.</p>
-            <div>{b.locations.map((l) => <div key={l.id}><b>{l.label}</b> · {l.street}{l.suite ? ', ' + l.suite : ''}, {l.city}, {l.state} {l.zip}</div>)}<div className="muted">{b.phone} · {b.email}</div></div>
-          </Item>
-          <Item id="h" icon="clock" title="Business hours" done doneLabel={'Mon to Fri ' + fmtHours(l0.hours.weekdays)} open={cur === 'h'} onToggle={() => toggle('h')}>
-            <p className="muted">Confirmed during launch.</p>
-            <div>Mon to Fri: {fmtHours(l0.hours.weekdays)} · Sat: {fmtHours(l0.hours.sat)} · Sun: {fmtHours(l0.hours.sun)} · {l0.tz} time</div>
-          </Item>
-          <Item id="s" icon="list" title="What you do" done doneLabel={b.services.length + ' practice areas'} open={cur === 's'} onToggle={() => toggle('s')}>
-            <p className="muted">Confirmed during launch.</p>
-            <div className="row">{b.services.map((x) => <span key={x.name} className="chip">{x.priority && <Icon name="star" size={14} />}{x.name}</span>)}</div>
-          </Item>
+      <Head eyebrow="AI MAX · Your setup" title="Finish setting up AI MAX." lede="Your website is live. Connect what you use and skip what you don’t. Your progress saves as you go.">
+        {p.doneAt && <div style={{ marginTop: 16 }}><Banner tone="good" icon="checkCircle" title="Your setup is complete.">Everything is connected or marked as not needed.</Banner></div>}
+      </Head>
+      <Progress done={done} total={6} label={done + ' of 6 done'} />
 
-          <Item id="social" icon="mapPin" title="Google Business Profile and socials" done={pi.social} state={SOCIALS.some((x) => p[x.key].status === 'connected') ? 'warn' : ''} open={cur === 'social'} onToggle={() => toggle('social')}
-            doneLabel={pi.social ? 'All set' : SOCIALS.filter((x) => ['connected', 'none'].includes(p[x.key].status)).length + ' of 3 handled'}>
-            <p className="muted">Connect each account so AI MAX can help with reviews and posts. We’ll only ask you to pick the right business or page.</p>
+      <div className="tgrid">
+        {cards.map((c) => (
+          <TaskCard key={c.key} icon={c.icon} title={c.title} status={c.done ? 'done' : c.warn ? 'warn' : 'todo'} badge={c.badge}
+            actions={<button className={'btn btn--sm ' + (c.done ? 'btn--ghost' : 'btn--primary')} onClick={() => setSheet(c.key)}>{view(c.key) ? 'View' : c.done ? 'Change' : c.warn ? 'Continue' : 'Start'}</button>}>
+            {c.text}
+          </TaskCard>
+        ))}
+      </div>
+
+      <h2 className="h2" style={{ marginTop: 36 }}>Turns on as you connect</h2>
+      <div className="unlocks">
+        {features.map((f) => (
+          <div key={f.t} className={'unlock' + (f.on ? ' is-on' : '')}>
+            <Icon name={f.on ? 'checkCircle' : 'lock'} size={22} />
+            <b>{f.t}</b>
+            <span>{f.on ? 'On' : f.need}</span>
+          </div>
+        ))}
+      </div>
+      <div className="banner" style={{ marginTop: 28 }}>
+        <Icon name="message" size={22} />
+        <div><b>Need a change to your website?</b>From now on, ask for website changes right here in AI MAX. <button className="linkbtn" onClick={() => say('In AI MAX, this opens your website request form.')}>Ask for a change</button></div>
+      </div>
+
+      {open && (
+        <Sheet title={open.title} icon={open.icon} onClose={() => setSheet(null)}>
+          {view(open.key) && <p className="muted">Confirmed during launch. Nothing to do here.</p>}
+          {open.key === 'd' && <div>{b.locations.map((l) => <div key={l.id}><b>{l.label}</b> · {l.street}{l.suite ? ', ' + l.suite : ''}, {l.city}, {l.state} {l.zip}</div>)}<div className="muted">{b.phone} · {b.email}</div></div>}
+          {open.key === 'h' && <div>Mon to Fri: {fmtHours(l0.hours.weekdays)} · Sat: {fmtHours(l0.hours.sat)} · Sun: {fmtHours(l0.hours.sun)} · {l0.tz} time</div>}
+          {open.key === 's' && <div className="row">{b.services.map((x) => <span key={x.name} className="chip">{x.priority && <Icon name="star" size={14} />}{x.name}</span>)}</div>}
+          {open.key === 'social' && <>
+            <p className="muted">Connect each account so AI MAX can help with reviews and posts. You’ll only pick the right business or page.</p>
             {SOCIALS.map((x) => (
               <Row key={x.key} item={x} status={p[x.key].status} account={p[x.key].account} onHelp={onHelp}
                 onConnect={() => setFlow(x)} onNone={() => mut((d) => { d.platform[x.key] = { status: 'none', account: null }; })}
                 onUndo={() => mut((d) => { d.platform[x.key] = { status: 'idle', account: null }; })} />
             ))}
-          </Item>
-
-          <Item id="crm" icon="plug" title="Your business software" done={pi.crm} state={crmState === 'selected' ? 'warn' : ''} open={cur === 'crm'} onToggle={() => toggle('crm')}
-            doneLabel={crmLabel || 'Choose what you use'}>
-            <p className="muted">This is where you keep track of people who contact you. Choosing one is not the same as connecting it.</p>
+          </>}
+          {open.key === 'crm' && <>
+            <p className="muted">Choosing a system is not the same as connecting it.</p>
             <div className="optlist" role="radiogroup" aria-label="Business software">
               {CRM_OPTIONS.map((o) => (
                 <button key={o} role="radio" aria-checked={p.crm.choice === o} className={'opt' + (p.crm.choice === o ? ' is-on' : '')}
@@ -155,48 +181,19 @@ export function Platform({ onHelp }) {
                 <button className="btn btn--soft" disabled={!otherCrm.trim()} onClick={() => mut((d) => { d.platform.crm.other = otherCrm.trim(); d.platform.crm.state = 'other'; })}>Save</button>
               </div>
             )}
-            {crmState === 'selected' && <div className="banner banner--warn"><Icon name="plug" size={22} /><div><b>{p.crm.choice} is selected, but not connected yet.</b>Connect it so inquiries can flow into it.<div style={{ marginTop: 10 }}><button className="btn btn--primary btn--sm" onClick={() => setFlow({ crm: true })}><Icon name="plug" size={18} /> Connect {p.crm.choice}</button></div></div></div>}
-            {crmState === 'other' && <Banner tone="warn" icon="info" title="Noted. It isn’t connected.">We’ll let you know if AI MAX can connect to {p.crm.other}. Features that need it stay off for now.</Banner>}
+            {crmState === 'selected' && <div className="banner banner--warn"><Icon name="plug" size={22} /><div><b>{p.crm.choice} is chosen, but not connected yet.</b>Connect it so inquiries can flow into it.<div style={{ marginTop: 10 }}><button className="btn btn--primary btn--sm" onClick={() => setFlow({ crm: true })}><Icon name="plug" size={18} /> Connect {p.crm.choice}</button></div></div></div>}
+            {crmState === 'other' && <Banner tone="warn" icon="info" title="Noted. It isn’t connected.">We’ll let you know if AI MAX can connect to {p.crm.other}.</Banner>}
             {crmState === 'connected' && <Banner tone="good" icon="checkCircle" title={p.crm.choice + ' is connected.'} />}
-            {crmState === 'deferred' && <Banner icon="clock" title="No problem.">Come back when you’re ready. This step stays open.</Banner>}
-          </Item>
-
-          <Item id="rev" icon="trendingUp" title="Revenue goal" done={pi.revenue} open={cur === 'revenue'} onToggle={() => toggle('revenue')}
-            doneLabel={pi.revenue ? '$' + Number(p.revenue.amount).toLocaleString('en-US') + ' per ' + p.revenue.period : 'What would you like to grow toward?'}>
+            {crmState === 'deferred' && <Banner icon="clock" title="No problem.">Come back when you’re ready.</Banner>}
+          </>}
+          {open.key === 'revenue' && <>
             <p className="muted">A goal helps AI MAX show your progress in plain numbers.</p>
-            <div className="grid2">
-              <Input label="My goal" inputMode="numeric" placeholder="50,000" value={amt ? Number(amt).toLocaleString('en-US') : ''} onChange={(e) => setAmt(e.target.value.replace(/\D/g, ''))} />
-              <Select label="How often" value={p.revenue.period} onChange={(e) => mut((d) => { d.platform.revenue.period = e.target.value; d.platform.revenue.saved = false; })}><option value="month">Per month</option><option value="quarter">Per quarter</option><option value="year">Per year</option></Select>
-            </div>
+            <Input label="My goal" inputMode="numeric" placeholder="50,000" value={amt ? Number(amt).toLocaleString('en-US') : ''} onChange={(e) => setAmt(e.target.value.replace(/\D/g, ''))} />
+            <Select label="How often" value={p.revenue.period} onChange={(e) => mut((d) => { d.platform.revenue.period = e.target.value; d.platform.revenue.saved = false; })}><option value="month">Per month</option><option value="quarter">Per quarter</option><option value="year">Per year</option></Select>
             <div><button className="btn btn--primary" disabled={!amt} onClick={() => { mut((d) => { d.platform.revenue.amount = amt; d.platform.revenue.saved = true; }); say('Goal saved.'); }}>{pi.revenue ? 'Update goal' : 'Save my goal'}</button></div>
-          </Item>
-        </div>
-
-        <aside className="stack" style={{ position: 'sticky', top: 100 }}>
-          <div className="card">
-            <div className="row" style={{ justifyContent: 'space-between' }}><b>Your setup</b><b>{done} of 6</b></div>
-            <div className="prog" style={{ marginTop: 10 }} role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={6}><i style={{ width: (done / 6) * 100 + '%' }} /></div>
-            <p className="muted small" style={{ marginTop: 10 }}>{done === 6 ? 'All done.' : 'Come back any time. We’ll keep your place.'}</p>
-          </div>
-          <div className="card">
-            <b>Turns on as you connect</b>
-            <div style={{ marginTop: 6 }}>
-              {features.map((f) => (
-                <div key={f.t} className="locked" style={{ opacity: f.on ? 1 : 0.6 }}>
-                  <Icon name={f.on ? f.icon : 'lock'} size={20} />
-                  <div className="grow"><div style={{ fontWeight: 600 }}>{f.t}</div><div className="small muted">{f.on ? 'On' : f.need}</div></div>
-                  {f.on && <Badge tone="good">On</Badge>}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="card card--tight">
-            <b>Need a change to your website?</b>
-            <p className="muted small" style={{ margin: '6px 0 12px' }}>From now on, ask for website changes right here in AI MAX.</p>
-            <button className="btn btn--ghost btn--sm" onClick={() => say('In AI MAX, this opens your website request form.')}><Icon name="message" size={18} /> Ask for a change</button>
-          </div>
-        </aside>
-      </div>
+          </>}
+        </Sheet>
+      )}
 
       {flow && flow.crm && <ConnectFlow name={p.crm.choice} pick="Choose your account" accounts={[CLIENT.firm + ' (main account)']} scopes={['See your contacts and matters', 'Add new inquiries for you']} onDone={crmConnect} onClose={() => setFlow(null)} />}
       {flow && flow.key && <ConnectFlow name={flow.name} pick={flow.pick} accounts={flow.accounts} scopes={flow.key === 'google' ? ['See and manage your business listing', 'Read and reply to reviews'] : ['See your page', 'Publish posts you approve']} onDone={(a) => connectSocial(flow.key, a)} onClose={() => setFlow(null)} />}
