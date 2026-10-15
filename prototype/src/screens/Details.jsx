@@ -185,7 +185,7 @@ export function DetailsForm() {
       {err && <div style={{ marginTop: 18 }}><Banner tone="bad" icon="alert">{err}</Banner></div>}
 
       {open && (
-        <Sheet title={open.title} icon={open.icon} doneLabel="Save and close" onClose={() => setSheet(null)} onDone={() => { mark(open.key); setSheet(null); setErr(''); }}>
+        <Sheet title={open.title} icon={open.icon} label="Step 2 of 4 · Details" cancel doneLabel="Save and close" onClose={() => setSheet(null)} onDone={() => { mark(open.key); setSheet(null); setErr(''); }}>
           {editors[open.key]}
         </Sheet>
       )}

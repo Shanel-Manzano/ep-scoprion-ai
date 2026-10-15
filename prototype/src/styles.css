@@ -60,7 +60,7 @@
   font-family: var(--font-body); font-size: 18px; line-height: 1.5; color: var(--ink);
   background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%) fixed;
 }
-\.app::before {
+.app::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: var(--glow);
   background: radial-gradient(42% 42% at 14% 12%, rgba(0,127,253,.42), transparent 70%),
               radial-gradient(40% 40% at 92% 96%, rgba(136,89,255,.20), transparent 70%),
@@ -591,7 +591,6 @@ button.chip:hover { border-color: var(--accent); }
 }
 .app[data-tone="light"]::after { display: block; background: radial-gradient(ellipse at 88% 0%, rgba(120,110,255,.10), transparent 52%); }
 .app[data-tone="dark"] { --bg1: #0c1020; --bg2: #11172c; --ink: #f2f4fb; --ink2: #a9b2c8; --cardline: rgba(255,255,255,.12); --fieldline: rgba(255,255,255,.24); --accent: #93b2ff; }
-.app::before { background: radial-gradient(42% 42% at 12% 10%, rgba(0,127,253,.26), transparent 70%), radial-gradient(40% 40% at 94% 96%, rgba(136,89,255,.12), transparent 70%); }
 .app { --cta: linear-gradient(110deg, #2469ff 0%, #4a5cf0 100%); }
 
 .app :where(h1, h2, h3, h4) { font-weight: 700; letter-spacing: -.025em; }
@@ -747,3 +746,169 @@ button.chip:hover { border-color: var(--accent); }
 @media (max-width: 1100px) { .dgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .dgrid { grid-template-columns: minmax(0, 1fr); } }
 .main--mid { max-width: 1180px; }
+
+/* =====================================================================
+   PLATFORM MATCH. Same look as the live Scorpion platform so the bridge
+   after sign up feels like one product: charcoal and white surfaces,
+   Outfit throughout, blue-to-violet only on titles, buttons and the thin
+   card edge, tracked small-caps labels, location chip, theme toggle.
+   Platform values sampled from the supplied dark and light screens.
+   ===================================================================== */
+.app { --font-body: "Outfit", "Host Grotesk", system-ui, sans-serif; --font-display: "Outfit", system-ui, sans-serif; --pgrad: linear-gradient(95deg, #0e7bfc 0%, #875ef4 100%); --cta: linear-gradient(95deg, #2874f9 0%, #7a5cf5 100%); --blue: #0e7bfc; font-weight: 400; }
+.app[data-tone="dark"] {
+  --bg1: #111113; --bg2: #111113; --ink: #f3f5f9; --ink2: #9ba3b4; --card: #1a1d27; --cardline: rgba(255,255,255,.09);
+  --field: #12141b; --fieldline: rgba(255,255,255,.2); --accent: #4d9bff; --accent-soft: rgba(43,115,245,.16); --topbar: #181818; --shadowc: rgba(0,0,0,.45);
+  --good: #5fd4a0; --good-soft: rgba(95,212,160,.14); --warn: #ffb066; --warn-soft: rgba(255,176,102,.14); --glow: 0;
+}
+.app[data-tone="light"] {
+  --bg1: #f9f9f9; --bg2: #f9f9f9; --ink: #12161f; --ink2: #5d6577; --card: #ffffff; --cardline: #e5e8ef;
+  --field: #ffffff; --fieldline: #cdd3df; --accent: #1b6cf2; --accent-soft: #eaf3ff; --topbar: #ffffff; --shadowc: rgba(20,40,90,.07);
+  --good: #12805c; --good-soft: #e6f6ef; --warn: #b25e00; --warn-soft: #fff1dc;
+}
+.app::after { display: none !important; }
+.app, .topbar, .card, .tcard, .dtile, .su__card { transition-property: background-color, color, border-color, box-shadow; }
+
+/* headings: gradient on page titles, like the platform */
+.h1 { background: var(--pgrad); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 700; letter-spacing: -.025em; padding-bottom: .06em; }
+.su__h { background: none; color: var(--ink); -webkit-background-clip: border-box; }
+.accent { background: var(--pgrad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.app[data-tone="light"] .accent { background: var(--pgrad); -webkit-background-clip: text; background-clip: text; }
+.app :where(h2, h3, h4) { font-weight: 600; }
+.eyebrow, .kicker, .mono { font-weight: 600; letter-spacing: .12em; color: var(--ink2); }
+.su .kicker { color: var(--ink2); }
+.lede, .su__lede { color: var(--ink2); }
+
+/* top bar: wordmark + section label, gradient hairline, chip, toggle, avatar */
+.topbar { background: var(--topbar); backdrop-filter: none; border-bottom: 0; min-height: 66px; position: sticky; }
+.topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--pgrad); opacity: .9; }
+.brand { gap: 14px; font-size: 13px; letter-spacing: .2em; font-weight: 500; align-items: center; }
+.brand__word { display: block; width: 118px; height: 17px; background: var(--ink); -webkit-mask: url("scorpion-wordmark.svg") left center/contain no-repeat; mask: url("scorpion-wordmark.svg") left center/contain no-repeat; }
+.brand__label { font-family: var(--font-body); font-size: 12px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase; color: var(--ink2); }
+.topbar__right { gap: 14px; }
+.locchip { display: inline-flex; align-items: center; gap: 7px; font-size: 14.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.locchip svg { color: var(--ink2); }
+.themebtn { width: 36px; height: 36px; border: 0; background: none; color: var(--accent); display: grid; place-items: center; border-radius: 50%; cursor: pointer; }
+.themebtn:hover { background: var(--accent-soft); }
+.app[data-tone="dark"] .themebtn { color: #ffd166; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: #2f6bff; color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 600; letter-spacing: .02em; flex: none; }
+.tdot { border-color: var(--fieldline); }
+.is-active .tdot { background: var(--cta); }
+@media (max-width: 1180px) { .locchip { display: none; } }
+@media (max-width: 760px) { .brand__word { width: 96px; } .brand__label { display: none; } .avatar { display: none; } }
+
+/* buttons */
+.btn { font-family: var(--font-body) !important; font-weight: 600; letter-spacing: 0; }
+.btn--primary { background: var(--cta); box-shadow: 0 8px 22px rgba(80,95,245,.28); }
+.btn--ghost { background: transparent; }
+.app[data-tone="dark"] .btn--ghost { border-color: rgba(255,255,255,.22); }
+.app[data-tone="dark"] .btn--ghost:hover:not(:disabled) { background: rgba(255,255,255,.06); border-color: var(--accent); }
+.btn--tint { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.app[data-tone="light"] .btn--tint { background: #eaf3ff; border-color: #cfe1fb; color: #1b5fd9; }
+.app[data-tone="dark"] .btn--tint { border-color: rgba(77,155,255,.35); }
+.prog i, .tbar i, .progress i { background: var(--pgrad); }
+.prog { background: var(--cardline); }
+
+/* surfaces: platform card = quiet fill, hairline, thin gradient edge on top */
+.card, .tcard, .dtile, .su__card, .acc__item, .setup__item, .person, .wsteps, .plan { background: var(--card); border: 1px solid var(--cardline); box-shadow: 0 10px 34px var(--shadowc); position: relative; }
+.app[data-tone="light"] .tcard, .app[data-tone="light"] .dtile, .app[data-tone="light"] .su__card { background: linear-gradient(180deg, #f6faff 0%, #ffffff 46%); }
+.tcard::before, .dtile::before, .su__card::before, .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; border-radius: 18px 18px 0 0; background: var(--pgrad); opacity: .9; pointer-events: none; }
+.dtile.is-checked, .tcard.is-done { background: var(--card); border-color: color-mix(in srgb, var(--good) 40%, var(--cardline)); }
+.app[data-tone="light"] .dtile.is-checked, .app[data-tone="light"] .tcard.is-done { background: linear-gradient(180deg, #f1faf6 0%, #ffffff 50%); }
+.dtile.is-checked::before, .tcard.is-done::before { background: linear-gradient(90deg, var(--good), color-mix(in srgb, var(--good) 40%, transparent)); }
+.su__card { border-radius: 24px; }
+.su__card::before { border-radius: 24px 24px 0 0; }
+
+/* task card, platform onboarding style: outlined icon, title, pill, meta + Start */
+.tcard { padding: 26px 26px 22px; gap: 12px; border-radius: 18px; }
+.tcard__head { display: flex; align-items: center; gap: 14px; }
+.tcard__ico { width: auto; height: auto; background: none; color: var(--blue); border-radius: 0; }
+.tcard__t { font-size: 19px; font-weight: 600; margin: 0; letter-spacing: -.01em; flex: 1; min-width: 0; }
+.tcard__pill { font-size: 12.5px; font-weight: 600; padding: 3px 11px; border-radius: 999px; white-space: nowrap; }
+.tcard__pill--done { background: var(--good-soft); color: var(--good); }
+.tcard__pill--todo { background: var(--accent-soft); color: var(--accent); }
+.tcard__pill--warn { background: none; color: var(--warn); padding: 3px 0; }
+.tcard__body { font-size: 15px; }
+.tcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 6px; }
+.tcard__meta { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink2); }
+.tcard__act { margin: 0; padding: 0; }
+.tcard.is-done .tcard__act .btn--ghost { background: transparent; }
+
+/* details tile */
+.dtile { padding: 26px; border-radius: 18px; }
+.dtile__ico { width: auto; height: auto; background: none; color: var(--blue); }
+.dtile.is-checked .dtile__ico { background: none; color: var(--good); }
+.dtile__t { font-size: 18px; font-weight: 600; }
+.dtile__act { border-top-color: var(--cardline); }
+.dtile.is-checked .dtile__act { border-top-color: color-mix(in srgb, var(--good) 22%, var(--cardline)); }
+
+/* platform-style dialog */
+.pm { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px; }
+.pm .scrim { background: rgba(8,10,16,.62); backdrop-filter: blur(5px); z-index: 1; }
+.pm__box { position: relative; z-index: 2; width: 720px; max-width: 100%; max-height: calc(100vh - 32px); overflow: auto; background: var(--card); color: var(--ink); border: 1px solid var(--cardline); border-radius: 26px; box-shadow: 0 40px 100px rgba(0,0,0,.45); display: flex; flex-direction: column; animation: pop2 .2s ease-out both; }
+.app[data-tone="light"] .pm__box { background: #fff; }
+.pm__bar { height: 5px; background: var(--pgrad); flex: none; }
+.pm__head { display: flex; align-items: center; gap: 14px; padding: 28px 32px 0; }
+.pm__ico { width: 46px; height: 46px; border-radius: 50%; background: var(--pgrad); color: #fff; display: grid; place-items: center; flex: none; }
+.pm__label { flex: 1; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink2); }
+.pm__x { background: none; border: 0; color: var(--ink2); width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; }
+.pm__x:hover { background: var(--accent-soft); color: var(--ink); }
+.pm__title { padding: 14px 32px 0; font-size: clamp(26px, 3vw, 34px); letter-spacing: -.025em; font-weight: 700; background: var(--pgrad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pm__body { padding: 22px 32px 10px; display: grid; gap: 20px; flex: 1; }
+.pm__foot { padding: 20px 32px 28px; border-top: 1px solid var(--cardline); margin-top: 14px; display: flex; justify-content: flex-end; gap: 12px; }
+.pm .loc { background: transparent; border-color: var(--cardline); }
+.pm .field > label, .pm .lbl { color: var(--ink); }
+@media (max-width: 760px) {
+  .pm { align-items: end; padding: 0; }
+  .pm__box { border-radius: 24px 24px 0 0; max-height: 92vh; }
+  .pm__head, .pm__title, .pm__body, .pm__foot { padding-left: 20px; padding-right: 20px; }
+  .pm__foot .btn { flex: 1; }
+}
+.actionbar { background: var(--topbar); border-top: 1px solid var(--cardline); backdrop-filter: none; }
+.chip.is-on, .opt.is-on { border-color: var(--accent); }
+.input:focus, .select:focus, .textarea:focus { border-color: var(--accent); }
+.app[data-tone="dark"] .input, .app[data-tone="dark"] .select, .app[data-tone="dark"] .textarea { background: var(--field); }
+.seg { background: var(--accent-soft); }
+.seg button.is-on { background: var(--cta); }
+.app[data-tone="dark"] .seg--dark { background: rgba(255,255,255,.08); }
+.wsteps .wstep.is-now { border-color: var(--blue); }
+.demo__tab { border-color: #2874f9; }
+
+
+/* =====================================================================
+   AI MAX DARK. Sign up uses the AI MAX site look (night sky, drifting blue,
+   violet and cyan light, periwinkle mono kickers, blue-to-violet buttons).
+   It fades into the platform's light look once the account exists.
+   Values from the Scorpion / AI MAX visual design guide.
+   ===================================================================== */
+.app[data-brand="aimax"] {
+  --bg1: #0b1014; --bg2: #0b1014; --ink: #ffffff; --ink2: #aeb6c8; --card: rgba(15,22,34,.9); --cardline: rgba(255,255,255,.1);
+  --field: rgba(255,255,255,.05); --fieldline: rgba(255,255,255,.2); --accent: #8fb1ff; --accent-soft: rgba(120,150,255,.14);
+  --topbar: rgba(11,16,20,.62); --shadowc: rgba(0,0,0,.45); --glow: 1;
+  --pgrad: linear-gradient(110deg, #3d9bff 0%, #a389ff 100%); --cta: linear-gradient(95deg, #4d8dff 0%, #9b6bff 100%);
+}
+.app[data-brand="aimax"]::before {
+  background:
+    radial-gradient(50% 44% at 55% 46%, rgba(8,11,18,.82) 0%, rgba(8,11,18,.5) 55%, rgba(8,11,18,0) 100%),
+    radial-gradient(80% 90% at 0% 0%, rgba(0,118,240,.78), transparent 74%),
+    radial-gradient(65% 70% at 100% 100%, rgba(120,86,235,.62), transparent 74%),
+    radial-gradient(34% 34% at 100% 18%, rgba(34,211,238,.22), transparent 70%);
+  filter: blur(26px);
+}
+@media (prefers-reduced-motion: no-preference) { .app[data-brand="aimax"]::before { animation: skyDrift 40s ease-in-out infinite alternate; } }
+@keyframes skyDrift { to { transform: translate3d(-2vw, 2vh, 0) scale(1.06); } }
+.app[data-brand="aimax"] .topbar { backdrop-filter: blur(18px); }
+.app[data-brand="aimax"] .topbar::after { background: linear-gradient(90deg, transparent, rgba(120,150,255,.5), transparent); height: 1px; }
+.app[data-brand="aimax"] .kicker { font-family: var(--mono); font-size: 12.5px; font-weight: 500; letter-spacing: .22em; color: #8fb1ff; display: flex; align-items: center; gap: 12px; }
+.app[data-brand="aimax"] .kicker::before { content: ""; width: 14px; height: 14px; background: linear-gradient(110deg, #007ffd, #6d59ff); -webkit-mask: var(--mark) center/contain no-repeat; mask: var(--mark) center/contain no-repeat; flex: none; }
+.app[data-brand="aimax"] .su__h { letter-spacing: -.04em; }
+.app[data-brand="aimax"] .su__card { background: linear-gradient(160deg, rgba(20,27,50,.9), rgba(9,12,22,.94)); border-color: rgba(255,255,255,.12); box-shadow: 0 40px 100px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06); }
+.app[data-brand="aimax"] .btn--primary { box-shadow: 0 14px 40px rgba(99,116,255,.32); }
+.app[data-brand="aimax"] .input, .app[data-brand="aimax"] .select { background: rgba(255,255,255,.05); }
+.app[data-brand="aimax"] .su__stage { background: rgba(15,22,34,.6); }
+.toplink, .saved, .locchip { white-space: nowrap; }
+
+.brand--stack { flex-direction: column; align-items: flex-start; gap: 0; line-height: 1; }
+.brand--stack .brand__word { width: 112px; height: 16px; background: #fff; }
+.brand__aimax { font-family: var(--font-display); font-weight: 300; font-size: 25px; letter-spacing: -.02em; color: #fff; line-height: 1; margin-top: 1px; }
+.brand__aimax b { font-weight: 700; background: linear-gradient(180deg, #8f6cff 0%, #2f8bff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.app[data-brand="aimax"] .topbar { min-height: 76px; }

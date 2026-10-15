@@ -216,7 +216,7 @@ export function LaunchDetails() {
       </div>
 
       {sheet && (
-        <Sheet title={cards.find((x) => x.key === sheet).title} icon={cards.find((x) => x.key === sheet).icon} onClose={() => setSheet(null)}>
+        <Sheet label="Step 4 of 4 · Launch" title={cards.find((x) => x.key === sheet).title} icon={cards.find((x) => x.key === sheet).icon} onClose={() => setSheet(null)}>
           {sheet === 'calls' && <Calls />}
           {sheet === 'forms' && <Forms />}
           {sheet === 'followup' && <Followup />}

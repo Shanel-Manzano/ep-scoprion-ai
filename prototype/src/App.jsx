@@ -49,8 +49,11 @@ function Shell() {
     else if (paid && !s.confirmedAt && ['website', 'launch'].includes(stage)) go({ stage: 'details', view: 'form' });
   }, [stage, view, paid, s.confirmedAt]); // eslint-disable-line
 
+  const [pref, setPref] = useState(() => { try { return localStorage.getItem('aimax-theme') || ''; } catch (e) { return ''; } });
   const dark = stage === 'signup' && view !== 'welcome';
-  const tone = view === 'welcome' && stage === 'signup' ? (welcomeLight ? 'light' : 'dark') : dark ? 'dark' : 'light';
+  const auto = view === 'welcome' && stage === 'signup' ? (welcomeLight ? 'light' : 'dark') : dark ? 'dark' : 'light';
+  const tone = pref || auto;
+  const toggleTheme = () => { const n = tone === 'dark' ? 'light' : 'dark'; setPref(n); try { localStorage.setItem('aimax-theme', n); } catch (e) { /* noop */ } };
   const wide = stage === 'website' && (view === 'review' || !view);
   const bleed = stage === 'signup' && (view === 'form' || !view);
   const mid = stage === 'details';
@@ -59,9 +62,9 @@ function Shell() {
   useEffect(() => { document.body.style.background = tone === 'dark' ? '#0d0a1e' : '#f4f1ff'; document.body.style.transition = 'background 2.4s'; }, [tone]);
 
   return (
-    <div className="app" data-tone={tone}>
+    <div className="app" data-tone={tone} data-brand={tone === 'dark' && stage === 'signup' ? 'aimax' : 'platform'}>
       <a className="sr" href="#main">Skip to main content</a>
-      <Topbar onHelp={() => setHelp(true)} onLater={() => setLater(true)} />
+      <Topbar onHelp={() => setHelp(true)} onLater={() => setLater(true)} tone={tone} onToggleTheme={toggleTheme} />
       <main id="main" className={'main' + (wide ? ' main--wide' : '') + (bleed ? ' main--bleed' : '') + (mid ? ' main--mid' : '')} key={stage + '/' + view}>
         <Screen onHelp={() => setHelp(true)} />
       </main>

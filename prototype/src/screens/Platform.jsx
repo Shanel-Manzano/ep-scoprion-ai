@@ -104,11 +104,11 @@ export function Platform({ onHelp }) {
     { key: 'd', icon: 'briefcase', title: 'Business details', done: true, text: <><b>{b.name}</b><div className="dim">{l0.city}, {l0.state}</div></> },
     { key: 'h', icon: 'clock', title: 'Business hours', done: true, text: <><b>Mon to Fri {fmtHours(l0.hours.weekdays)}</b><div className="dim">{l0.tz} time</div></> },
     { key: 's', icon: 'list', title: 'What you do', done: true, text: <><b>{b.services.length} practice areas</b><div className="dim">{b.services.slice(0, 3).map((x) => x.name).join(', ')} and more</div></> },
-    { key: 'social', icon: 'mapPin', title: 'Google and social accounts', done: pi.social, warn: !pi.social && socialCount > 0, badge: pi.social ? 'Done' : socialCount ? socialCount + ' of 3' : 'To do',
+    { key: 'social', icon: 'mapPin', title: 'Google and social accounts', meta: '2 min', done: pi.social, warn: !pi.social && socialCount > 0, badge: pi.social ? 'Done' : socialCount ? socialCount + ' of 3' : 'To do',
       text: <><b>{pi.social ? 'All set.' : 'Connect Google, Facebook, and Instagram.'}</b><div className="dim">{pi.social ? 'Connected or marked as not used.' : 'Connect what you use. Skip what you don’t.'}</div></> },
-    { key: 'crm', icon: 'plug', title: 'Your business software', done: pi.crm, warn: crmState === 'selected' || crmState === 'deferred', badge: pi.crm ? 'Done' : crmState === 'selected' ? 'Not connected' : crmState === 'deferred' ? 'Later' : 'To do',
+    { key: 'crm', icon: 'plug', title: 'Your business software', meta: '3 min', done: pi.crm, warn: crmState === 'selected' || crmState === 'deferred', badge: pi.crm ? 'Done' : crmState === 'selected' ? 'Not connected' : crmState === 'deferred' ? 'Later' : 'To do',
       text: <><b>{crmLabel}</b><div className="dim">Where you keep track of people who contact you.</div></> },
-    { key: 'revenue', icon: 'trendingUp', title: 'Revenue goal', done: pi.revenue,
+    { key: 'revenue', icon: 'trendingUp', title: 'Revenue goal', meta: '2 min', done: pi.revenue,
       text: pi.revenue ? <><b>${Number(p.revenue.amount).toLocaleString('en-US')} per {p.revenue.period}</b><div className="dim">AI MAX shows your progress toward this.</div></> : <><b>What would you like to grow toward?</b><div className="dim">Takes about a minute.</div></> },
   ];
   const view = (k) => ['d', 'h', 's'].includes(k);
@@ -129,7 +129,7 @@ export function Platform({ onHelp }) {
 
       <div className="tgrid">
         {cards.map((c) => (
-          <TaskCard key={c.key} icon={c.icon} title={c.title} status={c.done ? 'done' : c.warn ? 'warn' : 'todo'} badge={c.badge}
+          <TaskCard key={c.key} icon={c.icon} title={c.title} meta={c.done ? null : c.meta} status={c.done ? 'done' : c.warn ? 'warn' : 'todo'} badge={c.badge}
             actions={<button className={'btn btn--sm ' + (c.done ? 'btn--ghost' : 'btn--primary')} onClick={() => setSheet(c.key)}>{view(c.key) ? 'View' : c.done ? 'Change' : c.warn ? 'Continue' : 'Start'}</button>}>
             {c.text}
           </TaskCard>
@@ -152,7 +152,7 @@ export function Platform({ onHelp }) {
       </div>
 
       {open && (
-        <Sheet title={open.title} icon={open.icon} onClose={() => setSheet(null)}>
+        <Sheet label="AI MAX setup" title={open.title} icon={open.icon} onClose={() => setSheet(null)}>
           {view(open.key) && <p className="muted">Confirmed during launch. Nothing to do here.</p>}
           {open.key === 'd' && <div>{b.locations.map((l) => <div key={l.id}><b>{l.label}</b> · {l.street}{l.suite ? ', ' + l.suite : ''}, {l.city}, {l.state} {l.zip}</div>)}<div className="muted">{b.phone} · {b.email}</div></div>}
           {open.key === 'h' && <div>Mon to Fri: {fmtHours(l0.hours.weekdays)} · Sat: {fmtHours(l0.hours.sat)} · Sun: {fmtHours(l0.hours.sun)} · {l0.tz} time</div>}

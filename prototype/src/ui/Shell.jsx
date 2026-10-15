@@ -16,7 +16,7 @@ export function Mark() {
   );
 }
 
-export function Topbar({ onHelp, onLater }) {
+export function Topbar({ onHelp, onLater, tone, onToggleTheme }) {
   const { s, go, saving } = useApp();
   const stage = s.route.stage;
   const idx = Math.max(0, STAGES.findIndex((x) => x.key === stage));
@@ -25,47 +25,58 @@ export function Topbar({ onHelp, onLater }) {
   const pi = platformItems(s);
   const pdone = Object.values(pi).filter(Boolean).length;
   const cur = STAGES[idx];
+  const initials = (s.signup.name || 'M D').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
   return (
     <header className="topbar">
-      <div className="brand" aria-label="AI MAX">
-        <Mark />
-        <div>AI MAX{inPlatform && s.signup.paidAt ? <small>{CLIENT.firm}</small> : <small>Website setup</small>}</div>
-      </div>
+      {tone === 'dark' && stage === 'signup' ? (
+        <div className="brand brand--stack" role="img" aria-label="AI MAX by Scorpion">
+          <span className="brand__word" aria-hidden="true" />
+          <span className="brand__aimax" aria-hidden="true">AI <b>MAX</b></span>
+        </div>
+      ) : (
+        <div className="brand" role="img" aria-label="AI MAX by Scorpion">
+          <span className="brand__word" aria-hidden="true" />
+          <span className="brand__label">{inPlatform ? 'Onboarding' : 'AI MAX'}</span>
+        </div>
+      )}
 
       {!inPlatform ? (
-        <>
-          <nav aria-label="Your progress">
-            <ol className="tracker">
-              {STAGES.map((st, i) => {
-                const done = stageDone(s, st.key);
-                const active = stage === st.key;
-                const can = canGoStage(s, st.key) && !active;
-                return (
-                  <li key={st.key} className={'tstep' + (done ? ' is-done' : '') + (active ? ' is-active' : '')}>
-                    <button className="tbtn" disabled={!can} onClick={() => go(stageRoute(s, st.key))} aria-current={active ? 'step' : undefined}
-                      title={!can && !active && !done ? 'Not yet. Finish the step before this one.' : undefined}>
-                      <span className="tdot">{done ? <Icon name="check" size={16} stroke={3.2} /> : i + 1}</span>
-                      {st.label}
-                      {done && <span className="sr"> (done)</span>}
-                      {active && <span className="sr"> (you are here)</span>}
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
-        </>
+        <nav aria-label="Your progress">
+          <ol className="tracker">
+            {STAGES.map((st, i) => {
+              const done = stageDone(s, st.key);
+              const active = stage === st.key;
+              const can = canGoStage(s, st.key) && !active;
+              return (
+                <li key={st.key} className={'tstep' + (done ? ' is-done' : '') + (active ? ' is-active' : '')}>
+                  <button className="tbtn" disabled={!can} onClick={() => go(stageRoute(s, st.key))} aria-current={active ? 'step' : undefined}
+                    title={!can && !active && !done ? 'Not yet. Finish the step before this one.' : undefined}>
+                    <span className="tdot">{done ? <Icon name="check" size={14} stroke={3.2} /> : i + 1}</span>
+                    {st.label}
+                    {done && <span className="sr"> (done)</span>}
+                    {active && <span className="sr"> (you are here)</span>}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
       ) : (
         <div className="pcenter"><b>Set up AI MAX</b>{pdone} of 6 done</div>
       )}
 
       <div className="topbar__right">
-        {paid && <span className="saved" aria-live="polite"><Icon name={saving ? 'refresh' : 'checkCircle'} size={18} /><span>{saving ? 'Saving…' : 'Progress saved'}</span></span>}
+        {paid && <span className="saved" aria-live="polite"><Icon name={saving ? 'refresh' : 'checkCircle'} size={17} /><span>{saving ? 'Saving…' : 'Progress saved'}</span></span>}
         {paid && !inPlatform && s.route.view !== 'live' && (
           <button className="toplink" onClick={onLater}><Icon name="save" size={16} /> <span className="hide-sm">Finish later</span></button>
         )}
-        <button className="toplink toplink--strong" onClick={onHelp}><Icon name="helpCircle" size={17} /> Help</button>
+        <button className="toplink toplink--strong" onClick={onHelp}><Icon name="helpCircle" size={17} /> <span className="hide-sm">Help</span></button>
+        {paid && <span className="locchip"><Icon name="mapPin" size={16} /> {CLIENT.firm}</span>}
+        <button className="themebtn" onClick={onToggleTheme} aria-label={tone === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={tone === 'dark' ? 'Light mode' : 'Dark mode'}>
+          <Icon name={tone === 'dark' ? 'sun' : 'moon'} size={18} />
+        </button>
+        {paid && <span className="avatar" aria-hidden="true">{initials}</span>}
       </div>
       <div className="mprog">
         {inPlatform
