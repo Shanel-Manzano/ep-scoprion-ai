@@ -181,10 +181,10 @@ export function DetailsForm() {
           const done = !!reviewed[c.key];
           const chg = changedIn(c.changed);
           return (
-            <TaskCard key={c.key} icon={c.icon} title={c.title} status={done ? 'done' : 'todo'} badge={done ? (chg ? 'Changed' : 'Looks right') : 'Check this'}
+            <TaskCard key={c.key} icon={c.icon} title={c.title} status={done ? 'done' : 'todo'} badge={done ? (chg ? 'Changed' : 'Looks right') : 'Please check'}
               actions={done
-                ? <button className="btn btn--ghost btn--sm" onClick={() => setSheet(c.key)}><Icon name="pencil" size={18} /> Change</button>
-                : <><button className="btn btn--primary btn--sm" onClick={() => mark(c.key)}><Icon name="check" size={18} /> Looks right</button><button className="btn btn--ghost btn--sm" onClick={() => setSheet(c.key)}><Icon name="pencil" size={18} /> Change</button></>}>
+                ? <button className="btn btn--ghost btn--sm" onClick={() => setSheet(c.key)}>Change</button>
+                : <><button className="btn btn--ghost btn--sm" onClick={() => mark(c.key)}><Icon name="check" size={16} /> Looks right</button><button className="linkbtn" onClick={() => setSheet(c.key)}>Change</button></>}>
               {summaries[c.key]}
             </TaskCard>
           );

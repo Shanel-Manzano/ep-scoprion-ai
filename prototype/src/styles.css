@@ -579,3 +579,111 @@ button.chip:hover { border-color: var(--accent); }
 @media (max-width: 760px) { .tgrid, .tgrid--3, .unlocks { grid-template-columns: minmax(0, 1fr); } .sheet { width: 100%; } .tcard { padding: 20px; } }
 .wsteps { margin-bottom: 18px; }
 .review .wsteps { margin-bottom: 0; }
+
+/* =====================================================================
+   CALM PASS. Quiet, light and spacious: small type, 1px lines, modest
+   controls, one accent. Overrides the heavier readability pass above.
+   ===================================================================== */
+.app { font-size: 16px; font-weight: 400; line-height: 1.6; }
+.app[data-tone="light"] {
+  --bg1: #f8f9fd; --bg2: #f4f5fc; --ink: #1c2238; --ink2: #646a82; --card: #ffffff; --cardline: #e4e6f0; --fieldline: #cfd4e4;
+  --accent: #2c5ccc; --accent-soft: #eef2ff; --shadowc: rgba(28,34,56,.05); --good: #168664; --good-soft: #e7f6ef; --warn: #9a5700; --warn-soft: #fff3df;
+}
+.app[data-tone="light"]::after { display: block; background: radial-gradient(ellipse at 88% 0%, rgba(120,110,255,.10), transparent 52%); }
+.app[data-tone="dark"] { --bg1: #0c1020; --bg2: #11172c; --ink: #f2f4fb; --ink2: #a9b2c8; --cardline: rgba(255,255,255,.12); --fieldline: rgba(255,255,255,.24); --accent: #93b2ff; }
+.app::before { background: radial-gradient(42% 42% at 12% 10%, rgba(0,127,253,.26), transparent 70%), radial-gradient(40% 40% at 94% 96%, rgba(136,89,255,.12), transparent 70%); }
+.app { --cta: linear-gradient(110deg, #2469ff 0%, #4a5cf0 100%); }
+
+.app :where(h1, h2, h3, h4) { font-weight: 700; letter-spacing: -.025em; }
+.h1 { font-size: clamp(28px, 3vw, 38px); line-height: 1.15; }
+.sform__h { font-size: clamp(32px, 3.2vw, 42px); letter-spacing: -.03em; }
+.h2 { font-size: 20px; }
+.lede { font-size: 16px; line-height: 1.6; color: var(--ink2); max-width: 54ch; margin-top: 10px; }
+.eyebrow, .kicker, .mono { font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
+.eyebrow { margin-bottom: 8px; }
+.head { margin-bottom: 24px; }
+.small, .hint, .muted.small { font-size: 14px; }
+.err { font-size: 14px; }
+.badge { font-size: 12px; padding: 3px 10px; }
+.field > label, .lbl { font-size: 14px; font-weight: 600; }
+
+/* controls: modest, hairline */
+.btn { min-height: 48px; padding: 0 22px; font-size: 15px; font-weight: 600; border-width: 1px; gap: 10px; }
+.btn--primary { box-shadow: 0 6px 16px rgba(36,105,255,.18); }
+.btn--ghost { background: var(--card); border-color: var(--cardline); color: var(--ink); }
+.app[data-tone="dark"] .btn--ghost { background: transparent; border-color: var(--fieldline); }
+.btn--ghost:hover:not(:disabled) { border-color: var(--accent); background: var(--card); }
+.btn--soft { background: var(--accent-soft); color: var(--accent); }
+.btn--sm { min-height: 42px; padding: 0 18px; font-size: 14px; }
+.btn--xs { min-height: 34px; padding: 0 12px; font-size: 13px; }
+.btn--xl { min-height: 54px; font-size: 16px; }
+.linkbtn { font-size: 14px; font-weight: 600; }
+.input, .select, .textarea { min-height: 48px; border-width: 1px; border-radius: 10px; font-size: 16px; padding: 10px 14px; }
+.input:focus, .select:focus, .textarea:focus { box-shadow: 0 0 0 3px var(--accent-soft); }
+.check, .toggle { font-size: 15px; }
+.check input { width: 22px; height: 22px; border-width: 1px; border-radius: 6px; }
+.seg button { min-height: 38px; padding: 6px 14px; font-size: 14px; }
+.chip { font-size: 14px; padding: 6px 12px; border-width: 1px; }
+.opt { font-size: 15px; border-width: 1px; padding: 12px 14px; }
+.card, .acc__item, .setup__item, .plan, .person, .wsteps { border-width: 1px; border-radius: 16px; box-shadow: 0 8px 30px var(--shadowc); }
+.banner { border-radius: 12px; padding: 14px 16px; font-size: 15px; }
+
+/* header: light, text links, small steps */
+.topbar { min-height: 68px; box-shadow: none; }
+.brand { font-size: 18px; }
+.toplink { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 8px 4px; font-size: 14px; font-weight: 500; color: var(--ink2); cursor: pointer; }
+.toplink--strong { color: var(--accent); font-weight: 600; }
+.toplink:hover { color: var(--ink); }
+.saved { font-size: 13px; color: var(--good); }
+.app[data-tone="dark"] .saved { color: #6ee7a8; }
+.tbtn { font-size: 13.5px; font-weight: 500; padding: 4px 8px 4px 4px; border: 0; gap: 8px; }
+.is-active .tbtn { background: none; border: 0; color: var(--ink); font-weight: 700; }
+.tdot { width: 24px; height: 24px; font-size: 11.5px; border-width: 1px; }
+.tstep + .tstep::before { width: 34px; height: 1px; }
+.mprog { font-size: 14px; }
+
+/* task cards: white, hairline, status label on top */
+.tcard { border-width: 1px; border-top-width: 1px; border-radius: 18px; padding: 24px; gap: 10px; box-shadow: 0 8px 30px var(--shadowc); }
+.tcard.is-done { background: var(--good-soft); border-color: #d3ece1; }
+.app[data-tone="light"] .tcard.is-done { background: #f6fbf9; }
+.tcard.is-warn, .tcard.is-todo { border-top-color: var(--cardline); }
+.tcard__status { display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; font-size: 12.5px; font-weight: 600; }
+.tcard__status--done { color: var(--good); }
+.tcard__status--todo { color: var(--accent); background: var(--accent-soft); padding: 3px 10px; border-radius: 999px; }
+.tcard__status--warn { color: var(--warn); background: var(--warn-soft); padding: 3px 10px; border-radius: 999px; }
+.tcard__t { font-size: 19px; margin-top: 6px; flex: none; }
+.tcard__body { font-size: 15px; color: var(--ink2); margin-bottom: 8px; }
+.tcard__body b { color: var(--ink); font-weight: 600; }
+.tcard__body .dim { font-size: 14px; }
+.tcard__act { align-items: center; margin-top: auto; padding-top: 6px; }
+.tgrid { gap: 16px; }
+.progress { font-size: 14px; margin: 2px 0 20px; }
+.prog { height: 8px; }
+.prog i { background: var(--cta); }
+
+/* website steps + instruction strip: smaller */
+.wsteps { padding: 14px 18px; border-radius: 14px; box-shadow: none; }
+.wstep { font-size: 14px; border-top-width: 3px; font-weight: 500; }
+.wstep__dot { width: 24px; height: 24px; font-size: 12px; border-width: 1px; }
+.wstep__here { font-size: 11.5px; }
+.wsteps__text { font-size: 15px; }
+.howbar { font-size: 15px; border-width: 1px; border-radius: 12px; padding: 10px 14px; }
+.howbar.is-edit { border-color: #c7d4f7; }
+.stagebox { border-radius: 16px; }
+.actionbar { box-shadow: 0 -6px 24px rgba(28,34,56,.04); }
+.actionbar__msg { font-size: 14px; }
+.drawer__head { padding: 16px 22px; }
+.edit { border-radius: 14px; }
+.edit__note { font-size: 15px; }
+
+/* sign up: the same quiet language on dark */
+.sform { gap: 18px; }
+.fsec { gap: 14px; padding-top: 20px; }
+.fsec__t { font-size: 17px; }
+.fsec__t span { width: 26px; height: 26px; font-size: 13px; }
+.plan__row--due { font-size: 20px; }
+.spane__url { font-size: clamp(20px, 2vw, 28px); }
+.person__txt b { font-size: 16px; }
+.person__txt { font-size: 14px; }
+.sform__cta .muted { font-size: 13px; }
+@media (max-width: 760px) { .app { font-size: 16px; } .tcard { padding: 20px; } }

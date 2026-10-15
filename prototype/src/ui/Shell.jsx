@@ -63,9 +63,9 @@ export function Topbar({ onHelp, onLater }) {
       <div className="topbar__right">
         {paid && <span className="saved" aria-live="polite"><Icon name={saving ? 'refresh' : 'checkCircle'} size={18} /><span>{saving ? 'Saving…' : 'Progress saved'}</span></span>}
         {paid && !inPlatform && s.route.view !== 'live' && (
-          <button className="btn btn--ghost btn--xs" onClick={onLater}><Icon name="save" size={16} /> <span className="hide-sm">Finish later</span></button>
+          <button className="toplink" onClick={onLater}><Icon name="save" size={16} /> <span className="hide-sm">Finish later</span></button>
         )}
-        <button className="btn btn--soft btn--xs" onClick={onHelp}><Icon name="helpCircle" size={18} /> Help</button>
+        <button className="toplink toplink--strong" onClick={onHelp}><Icon name="helpCircle" size={17} /> Help</button>
       </div>
       <div className="mprog">
         {inPlatform

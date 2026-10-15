@@ -2,15 +2,12 @@ import React, { useEffect } from 'react';
 import { Icon } from './Icons.jsx';
 
 // Task card: icon, title, one status badge, a short summary, one clear button.
-export function TaskCard({ icon, title, status = 'todo', badge, children, actions }) {
-  const label = badge || { done: 'Done', todo: 'To do', warn: 'Needs you' }[status];
+export function TaskCard({ title, status = 'todo', badge, children, actions }) {
+  const label = badge || { done: 'Complete', todo: 'To do', warn: 'Needs you' }[status];
   return (
     <section className={'tcard is-' + status}>
-      <header className="tcard__head">
-        <span className="tcard__ico"><Icon name={icon} size={24} /></span>
-        <h2 className="tcard__t">{title}</h2>
-        <span className={'tcard__badge tcard__badge--' + status}>{status === 'done' && <Icon name="check" size={14} stroke={3.2} />}{label}</span>
-      </header>
+      <div className={'tcard__status tcard__status--' + status}>{status === 'done' && <Icon name="check" size={14} stroke={3} />}{label}</div>
+      <h2 className="tcard__t">{title}</h2>
       <div className="tcard__body">{children}</div>
       {actions && <div className="tcard__act">{actions}</div>}
     </section>
