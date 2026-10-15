@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
-import { Head, Input, Check, Banner, Modal, Spinner, Tick, Kicker, useHeadingFocus } from '../ui/Primitives.jsx';
+import { Head, Input, Check, Banner, Modal, Spinner, Tick, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
 import ScaledSite from '../site/ScaledSite.jsx';
 import { useApp, siteFromBiz, money, now, rid, nextRoute, isPaid } from '../store.jsx';
@@ -21,38 +21,28 @@ function Terms({ onClose }) {
   );
 }
 
-function PlanSummary() {
-  return (
-    <div className="plan" aria-label="What you pay">
-      <div className="plan__row plan__row--due"><span>Due today</span><b>{money(PLAN.dueToday)}</b></div>
-    </div>
-  );
-}
-
-function SignupPreview({ site }) {
+function StoryPreview({ site }) {
   const [dev, setDev] = useState('desktop');
   return (
-    <aside className="spane" aria-label="Your new website">
-      <div className="spane__top">
-        <div>
-          <div className="mono">Step one · Your website</div>
-          <div className="spane__url">{CLIENT.site}</div>
-        </div>
+    <div className="su__preview" aria-label="Your new website">
+      <div className="su__previewbar">
+        <span className="su__previewlabel">Your website · {CLIENT.site}</span>
         <div className="seg seg--dark" role="group" aria-label="Preview size">
           <button className={dev === 'desktop' ? 'is-on' : ''} aria-pressed={dev === 'desktop'} onClick={() => setDev('desktop')}>Computer</button>
           <button className={dev === 'mobile' ? 'is-on' : ''} aria-pressed={dev === 'mobile'} onClick={() => setDev('mobile')}>Phone</button>
         </div>
       </div>
-      <div className={'spane__frame' + (dev === 'mobile' ? ' is-phone' : '')}>
-        <div className="minisite__bar"><i /><i /><i /><span>{CLIENT.site}</span></div>
-        <div className="spane__view">
-          <div style={{ width: dev === 'mobile' ? 300 : '100%', margin: '0 auto', height: '100%' }}>
-            <ScaledSite site={site} height="100%" device={dev} />
+      <div className={'su__stage' + (dev === 'mobile' ? ' is-phone' : '')}>
+        {dev === 'desktop' ? (
+          <div className="su__browser">
+            <div className="minisite__bar"><i /><i /><i /><span>{CLIENT.site}</span></div>
+            <ScaledSite site={site} height={330} />
           </div>
-        </div>
+        ) : (
+          <div className="su__phone"><ScaledSite site={site} height={400} device="mobile" /></div>
+        )}
       </div>
-      <p className="spane__note">Built from your business details. It’s your way into AI MAX, and it goes live only when you approve it.</p>
-    </aside>
+    </div>
   );
 }
 
@@ -97,42 +87,55 @@ export function SignupForm() {
   }
 
   return (
-    <div className="screen signup">
-      <form onSubmit={submit} noValidate className="sform" aria-label="Sign up and pay">
-        <Kicker>Step 1 of 4 · Create your account</Kicker>
-        <h1 className="h1 sform__h" tabIndex={-1} data-heading>Welcome to<br /><span className="accent">AI&nbsp;MAX.</span></h1>
-        <p className="lede">Create your account, then review your new website. Nothing goes live until you approve it.</p>
+    <div className="screen su">
+      <header className="su__head">
+        <div className="kicker">Step 1 of 4 · Your next chapter starts here</div>
+        <h1 className="su__h" tabIndex={-1} data-heading>Let’s get your website <span className="accent">live.</span></h1>
+        <p className="su__lede">Your new site is already taking shape.<br />Create your AI MAX account to make it yours.</p>
+      </header>
 
+      <StoryPreview site={siteFromBiz(s.applied)} />
+
+      <div className="su__plan" aria-label="Your plan">
+        <div className="su__planrow">
+          <div><b>AI MAX</b><div className="muted">{PLAN.term} term · billed monthly</div></div>
+          <div className="su__price">{money(PLAN.price)}<small> / month</small></div>
+        </div>
+        <ul className="su__perks"><li><Icon name="check" size={16} stroke={3} /> Your new website</li><li><Icon name="check" size={16} stroke={3} /> AI MAX to bring in inquiries</li><li><Icon name="check" size={16} stroke={3} /> A team behind you</li></ul>
+      </div>
+
+      <form onSubmit={submit} noValidate className="su__card" aria-label="Create your account and pay">
+        <div>
+          <div className="kicker">One account for AI MAX</div>
+          <h2 className="su__cardh">Create your account.</h2>
+        </div>
         {f.error && <Banner tone="bad" icon="alert" title="Your payment didn’t go through.">{f.error} Nothing was charged. Your answers are still here.</Banner>}
 
-        <section className="fsec" aria-labelledby="s1">
-          <h2 className="fsec__t" id="s1"><span>1</span>Your account</h2>
-          <Input label="Your name" autoComplete="name" value={f.name} onChange={(e) => set('name', e.target.value)} error={errs.name} />
-          <Input label="Email" type="email" autoComplete="email" value={f.email} onChange={(e) => set('email', e.target.value)} error={errs.email} />
-          <div className="field">
-            <label htmlFor="pw">Create a password</label>
-            <div className="pwwrap">
-              <input id="pw" className={'input' + (errs.password ? ' is-bad' : '')} type={showPw ? 'text' : 'password'} autoComplete="new-password" value={f.password} onChange={(e) => set('password', e.target.value)} style={{ paddingRight: 110 }} />
-              <button type="button" className="linkbtn" onClick={() => setShowPw(!showPw)}>{showPw ? 'Hide' : 'Show'}</button>
-            </div>
-            {errs.password ? <div className="err" role="alert"><Icon name="alert" size={18} /> {errs.password}</div> : <div className="hint">At least 8 characters.</div>}
+        <Input label="Your name" autoComplete="name" value={f.name} onChange={(e) => set('name', e.target.value)} error={errs.name} />
+        <Input label="Email" type="email" autoComplete="email" value={f.email} onChange={(e) => set('email', e.target.value)} error={errs.email} />
+        <div className="field">
+          <label htmlFor="pw">Create a password</label>
+          <div className="pwwrap">
+            <input id="pw" className={'input' + (errs.password ? ' is-bad' : '')} type={showPw ? 'text' : 'password'} autoComplete="new-password" value={f.password} onChange={(e) => set('password', e.target.value)} style={{ paddingRight: 90 }} />
+            <button type="button" className="linkbtn" onClick={() => setShowPw(!showPw)}>{showPw ? 'Hide' : 'Show'}</button>
           </div>
-        </section>
+          {errs.password ? <div className="err" role="alert"><Icon name="alert" size={18} /> {errs.password}</div> : <div className="hint">At least 8 characters.</div>}
+        </div>
 
-        <section className="fsec" aria-labelledby="s3">
-          <h2 className="fsec__t" id="s3"><span>2</span>Payment</h2>
+        <div className="su__sec">
+          <div className="row" style={{ justifyContent: 'space-between' }}><h3 className="su__sech">Payment</h3>
+            {s.demo.proto && <button type="button" className="skip" onClick={() => mut((d) => { Object.assign(d.signup, { card: '4242 4242 4242 4242', exp: '08/28', cvc: '123', zip: '75240' }); })}><span className="pill-proto">Prototype</span>Test card</button>}
+          </div>
           <Input label="Card number" inputMode="numeric" autoComplete="cc-number" placeholder="1234 5678 9012 3456" value={f.card} onChange={(e) => set('card', fmtCard(e.target.value))} error={errs.card} />
           <div className="grid3">
             <Input label="Expires" inputMode="numeric" autoComplete="cc-exp" placeholder="MM/YY" value={f.exp} onChange={(e) => set('exp', fmtExp(e.target.value))} error={errs.exp} />
             <Input label="Security code" inputMode="numeric" autoComplete="cc-csc" placeholder="123" value={f.cvc} onChange={(e) => set('cvc', e.target.value.replace(/\D/g, '').slice(0, 4))} error={errs.cvc} />
             <Input label="ZIP code" inputMode="numeric" autoComplete="postal-code" placeholder="75240" value={f.zip} onChange={(e) => set('zip', e.target.value.replace(/\D/g, '').slice(0, 5))} error={errs.zip} />
           </div>
-          <div className="secure"><Icon name="lock" size={16} /> Your card details are encrypted.
-            {s.demo.proto && <button type="button" className="skip" style={{ marginLeft: 'auto' }} onClick={() => mut((d) => { Object.assign(d.signup, { card: '4242 4242 4242 4242', exp: '08/28', cvc: '123', zip: '75240' }); })}><span className="pill-proto">Prototype</span>Test card</button>}
-          </div>
-        </section>
+          <div className="secure"><Icon name="lock" size={16} /> Your card details are encrypted.</div>
+        </div>
 
-        <PlanSummary />
+        <div className="su__due"><span>Due today</span><b>{money(PLAN.dueToday)}</b></div>
 
         <div className="field">
           <Check checked={f.agree} onChange={(e) => set('agree', e.target.checked)} data-err={errs.agree ? '' : undefined}>
@@ -141,14 +144,11 @@ export function SignupForm() {
           {errs.agree && <div className="err" role="alert"><Icon name="alert" size={18} /> {errs.agree}</div>}
         </div>
 
-        <div className="sform__cta">
-          <button className="btn btn--primary btn--block btn--xl" type="submit">Sign Up &amp; Pay <Icon name="arrowRight" size={22} /></button>
-          <p className="muted small">Your account is created once your payment goes through.</p>
+        <div className="su__cta">
+          <button className="btn btn--primary btn--block btn--xl" type="submit">Sign Up &amp; Pay {money(PLAN.dueToday)} <Icon name="arrowRight" size={20} /></button>
+          <p className="muted small">Next, you’ll confirm your details and review your site.</p>
         </div>
-
       </form>
-
-      <SignupPreview site={siteFromBiz(s.applied)} />
       {terms && <Terms onClose={() => setTerms(false)} />}
     </div>
   );

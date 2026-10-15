@@ -55,7 +55,7 @@ export function Demo({ onEmail }) {
   const set = (k, v) => mut((d) => { d.demo[k] = v; });
 
   return (
-    <div className="demo">
+    <div className={'demo' + (s.route.stage === 'signup' ? ' demo--low' : '')}>
       {open && (
         <div className="demo__panel" role="dialog" aria-label="Prototype controls">
           <div>
