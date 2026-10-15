@@ -4,7 +4,7 @@ import { Head, Badge, Banner, ActionBar, Skip, Tick, Person, useHeadingFocus } f
 import { EmailPreview } from '../ui/Emails.jsx';
 import { EditCard, StatusBadge } from './Review.jsx';
 import WebsiteSteps from '../ui/WebsiteSteps.jsx';
-import { useApp, drafts, sent, unresolvedSent, needsAnswer, teamEvent, now, rid, fmtTime } from '../store.jsx';
+import { useApp, launchItems, drafts, sent, unresolvedSent, needsAnswer, teamEvent, now, rid, fmtTime } from '../store.jsx';
 
 // "Check your edits" before anything is sent.
 export function SendReview() {
@@ -135,6 +135,20 @@ export function Tracking() {
       {qs.length > 0 && <div style={{ marginBottom: 18 }}><Banner tone="warn" icon="message" title={qs.length === 1 ? 'Your team has a question.' : 'Your team has ' + qs.length + ' questions.'}>They’ll continue as soon as you answer. <button className="linkbtn" onClick={jumpQ}>Answer now</button></Banner></div>}
 
       <div className="stack">
+        {!allReady && qs.length === 0 && (() => {
+          const it = launchItems(s); const n = [it.calls, it.forms, it.followup, it.domain].filter(Boolean).length;
+          return (
+            <section className="launchcard">
+              <div className="launchcard__ico"><Icon name="rocket" size={26} /></div>
+              <div className="grow">
+                <h2 className="h2">While you wait, get ready to launch.</h2>
+                <p className="muted">{n} of 4 launch details done. Your website goes live as soon as you approve it.</p>
+                <div className="prog" style={{ marginTop: 10 }}><i style={{ width: (n / 4) * 100 + '%' }} /></div>
+              </div>
+              <button className="btn btn--primary" onClick={() => go({ stage: 'launch', view: 'details' })}>{n === 4 ? 'Review launch details' : 'Complete Launch Details'} <Icon name="arrowRight" size={18} /></button>
+            </section>
+          );
+        })()}
         <Person line="I’m here if you have a question." />
         {qs.map((e) => <QuestionCard key={e.id} e={e} />)}
 

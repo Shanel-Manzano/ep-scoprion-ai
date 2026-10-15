@@ -1004,3 +1004,9 @@ button.chip:hover { border-color: var(--accent); }
 .browser__chrome { height: 52px; }
 .rv__head { align-items: center; }
 @media (max-width: 760px) { .browser__tools .seg button svg { display: none; } .browser__chrome { height: auto; padding: 8px 10px; flex-wrap: wrap; } .browser__tools { margin-left: 0; width: 100%; } }
+.app .roo-connect-dock { display: none !important; }
+.launchcard { display: flex; align-items: center; gap: 20px; padding: 22px 24px; border-radius: 18px; background: var(--card); border: 1px solid var(--accent); box-shadow: 0 10px 34px var(--shadowc); flex-wrap: wrap; }
+.launchcard__ico { width: 52px; height: 52px; border-radius: 50%; background: var(--pgrad); color: #fff; display: grid; place-items: center; flex: none; }
+.launchcard .grow { min-width: 220px; }
+.launchcard .h2 { font-size: 19px; }
+.launchcard .muted { margin: 4px 0 0; font-size: 14.5px; }

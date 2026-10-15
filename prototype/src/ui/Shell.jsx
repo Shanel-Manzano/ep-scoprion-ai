@@ -90,7 +90,7 @@ export function Topbar({ onHelp, onLater, tone, onToggleTheme }) {
 const TIPS = {
   'signup/form': ['You pay once to start, then the monthly price is shown on the right.', 'Your account is created only after your payment goes through.', 'If your card doesn’t work, nothing is lost. Your answers stay here so you can try again.'],
   'details/form': ['We filled in what we know. Only change what looks wrong.', 'Tap Edit on any box to fix it.', 'You only confirm once. Your team handles the rest.'],
-  'website/review': ['Choose Leave edits, then click anything on your website.', 'Switch to Browse any time to look around freely.', 'Nothing changes on your website until your team does the work.'],
+  'website/review': ['Click anything on your website you want changed.', 'If it all looks right, choose Looks Good, Approve at the top.', 'Nothing changes on your website until your team does the work.'],
   'website/send': ['Check each edit. You can still add or change them.', 'Sending edits does not approve your website.'],
   'website/tracking': ['Each edit shows where it stands.', 'If your team asks a question, answer it right here.'],
   'website/updating': ['You can finish your launch details while we work.', 'We’ll email you the moment your updated website is ready.'],
