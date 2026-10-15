@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
-import { Head, Badge, Banner, ActionBar, Skip, Tick, useHeadingFocus } from '../ui/Primitives.jsx';
+import { Head, Badge, Banner, ActionBar, Skip, Tick, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
 import { EditCard, StatusBadge } from './Review.jsx';
 import { useApp, drafts, sent, unresolvedSent, needsAnswer, teamEvent, now, rid, fmtTime } from '../store.jsx';
@@ -45,6 +45,7 @@ export function SendReview() {
             onDelete={() => mut((d) => { d.edits = d.edits.filter((x) => x.id !== e.id); })} />
         ))}
         <button className="btn btn--ghost" style={{ justifySelf: 'start' }} onClick={() => go({ stage: 'website', view: 'review' })}><Icon name="plus" size={18} /> Add or change edits</button>
+        <Person line="I’ll read every edit you send." />
         <div className="card card--tight field">
           <label htmlFor="gn">A note for your team <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></label>
           <textarea id="gn" className="textarea" placeholder="Anything else you’d like us to know? For example, “I’ll send new team photos tomorrow.”" value={s.generalNote} onChange={(e) => mut((d) => { d.generalNote = e.target.value; })} />
@@ -130,6 +131,7 @@ export function Tracking() {
       {qs.length > 0 && <div style={{ marginBottom: 18 }}><Banner tone="warn" icon="message" title={qs.length === 1 ? 'Your team has a question.' : 'Your team has ' + qs.length + ' questions.'}>They’ll continue as soon as you answer. <button className="linkbtn" onClick={jumpQ}>Answer now</button></Banner></div>}
 
       <div className="stack">
+        <Person line="I’m here if you have a question." />
         {qs.map((e) => <QuestionCard key={e.id} e={e} />)}
 
         <h2 className="h2" style={{ marginTop: 8 }}>Your edits</h2>

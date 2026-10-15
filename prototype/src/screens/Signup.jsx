@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
-import { Head, Input, Check, Banner, Modal, Spinner, Tick, Person, Kicker, useHeadingFocus } from '../ui/Primitives.jsx';
+import { Head, Input, Check, Banner, Modal, Spinner, Tick, Kicker, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
 import ScaledSite from '../site/ScaledSite.jsx';
 import { useApp, siteFromBiz, money, now, rid, nextRoute, isPaid } from '../store.jsx';
@@ -11,7 +11,7 @@ function Terms({ onClose }) {
     <Modal onClose={onClose} label="Service agreement">
       <h2 className="h2">Service agreement, in plain words.</h2>
       <ul style={{ paddingLeft: 22, display: 'grid', gap: 10 }}>
-        <li>You pay {money(PLAN.price)} per month for {PLAN.term}. Today you pay {money(PLAN.dueToday)}.</li>
+        <li>Today you pay {money(PLAN.dueToday)}. After that, {money(PLAN.price)} a month for {PLAN.term}, billed on the {PLAN.billDay}.</li>
         <li>Your website goes live only after you approve it.</li>
         <li>AI MAX handles your website requests after launch.</li>
         <li>The full agreement is emailed to you with your receipt.</li>
@@ -25,8 +25,6 @@ function PlanSummary() {
   return (
     <div className="plan" aria-label="What you pay">
       <div className="plan__row plan__row--due"><span>Due today</span><b>{money(PLAN.dueToday)}</b></div>
-      <div className="plan__row"><span>Then</span><span>{money(PLAN.price)} a month for {PLAN.termMonths} months</span></div>
-      <div className="plan__row"><span>Next bill</span><span>{PLAN.nextBill}</span></div>
     </div>
   );
 }
@@ -103,7 +101,7 @@ export function SignupForm() {
       <form onSubmit={submit} noValidate className="sform" aria-label="Sign up and pay">
         <Kicker>Step 1 of 4 · Create your account</Kicker>
         <h1 className="h1 sform__h" tabIndex={-1} data-heading>Welcome to<br /><span className="accent">AI&nbsp;MAX.</span></h1>
-        <p className="lede">Your new website is the first step. Pay once to start, and nothing goes live until you say so.</p>
+        <p className="lede">Create your account, then review your new website. Nothing goes live until you approve it.</p>
 
         {f.error && <Banner tone="bad" icon="alert" title="Your payment didn’t go through.">{f.error} Nothing was charged. Your answers are still here.</Banner>}
 
@@ -148,7 +146,6 @@ export function SignupForm() {
           <p className="muted small">Your account is created once your payment goes through.</p>
         </div>
 
-        <Person line="Questions before you pay? Ask me." />
       </form>
 
       <SignupPreview site={siteFromBiz(s.applied)} />
@@ -218,7 +215,7 @@ export function Welcome() {
         <span className="tick tick--todo" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>2</span>
         <div><b>Next, confirm your business details.</b><div className="muted small">We’ve filled in what we know.</div></div>
       </div>
-      <Person line="I’m your point of contact from here to launch." />
+
       <div className="row" style={{ justifyContent: 'center' }}>
         <button className="btn btn--primary" onClick={next}>Continue <Icon name="arrowRight" size={20} /></button>
         <button className="btn btn--ghost" onClick={() => setMail(true)}><Icon name="mail" size={18} /> See the email</button>

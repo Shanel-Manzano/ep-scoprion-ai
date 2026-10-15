@@ -3,11 +3,11 @@
 
 export const PLAN = {
   name: 'AI MAX, starting with your website',
-  price: 349,
+  price: 499,
   term: '12 months',
   termMonths: 12,
   billing: 'Monthly',
-  dueToday: 349,
+  dueToday: 499,
   nextBill: 'November 14, 2026',
   billDay: '14th',
 };

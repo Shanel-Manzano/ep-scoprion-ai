@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
-import { Head, Badge, Banner, ActionBar, Modal, useHeadingFocus } from '../ui/Primitives.jsx';
+import { Head, Badge, Banner, ActionBar, Modal, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import RooSite from '../site/RooSite.jsx';
 import { useApp, siteFromBiz, drafts, sent, pendingUpdate, unresolvedSent, now, rid } from '../store.jsx';
 import { REQUEST_TYPES, CLIENT } from '../data.js';
@@ -253,6 +253,7 @@ function MyEdits({ onClose, onSelect, selId, onEdit, onDelete, onSend }) {
           {sn.map((e) => <EditCard key={e.id} e={e} sel={e.id === selId} onSelect={onSelect} />)}
         </div>
         <div className="drawer__foot">
+          <Person compact line="I’ll read every edit you send." />
           <div className="muted small">Edits save automatically as you go.</div>
           <button className="btn btn--primary" disabled={d.length === 0} onClick={onSend}>Send to my team <Icon name="arrowRight" size={20} /></button>
         </div>
