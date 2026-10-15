@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
+import WebsiteSteps from '../ui/WebsiteSteps.jsx';
 import { Head, Badge, Banner, ActionBar, Modal, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import RooSite from '../site/RooSite.jsx';
 import { useApp, siteFromBiz, drafts, sent, pendingUpdate, unresolvedSent, now, rid } from '../store.jsx';
@@ -268,13 +269,12 @@ function MyEdits({ onClose, onSelect, selId, onEdit, onDelete, onSend }) {
 export function Review() {
   const { s, mut, go, say } = useApp();
   const [device, setDevice] = useState(window.innerWidth < 760 ? 'mobile' : 'desktop');
-  const [mode, setMode] = useState('browse');
+  const [mode, setMode] = useState('edit');
   const [draft, setDraft] = useState(null);
   const [drawer, setDrawer] = useState(false);
   const [selId, setSelId] = useState(null);
   const [focusId, setFocusId] = useState(null);
   const [confirm, setConfirm] = useState(false);
-  const [tourOpen, setTourOpen] = useState(window.innerWidth >= 760);
   useHeadingFocus('review');
 
   const site = siteFromBiz(s.applied);
@@ -331,59 +331,47 @@ export function Review() {
     window.scrollTo(0, 0);
   }
 
-  const modeSeg = (
-    <div className="seg" role="group" aria-label="What would you like to do?">
-      <button className={mode === 'browse' ? 'is-on' : ''} aria-pressed={mode === 'browse'} onClick={() => { setMode('browse'); setDraft(null); }}><Icon name="eye" size={18} /> Browse</button>
-      <button className={mode === 'edit' ? 'is-on' : ''} aria-pressed={mode === 'edit'} onClick={() => setMode('edit')}><Icon name="mousePointer" size={18} /> Leave edits</button>
-    </div>
-  );
   const devSeg = (
     <div className="seg" role="group" aria-label="Preview size">
       <button className={device === 'desktop' ? 'is-on' : ''} aria-pressed={device === 'desktop'} onClick={() => setDevice('desktop')}><Icon name="monitor" size={18} /> Computer</button>
       <button className={device === 'mobile' ? 'is-on' : ''} aria-pressed={device === 'mobile'} onClick={() => setDevice('mobile')}><Icon name="smartphone" size={18} /> Phone</button>
     </div>
   );
+  const statusText = justRevised ? 'Your team finished your edits. Look them over, then choose Looks good.'
+    : blocked ? 'Your team is still working. You can approve once they finish.'
+    : ds.length ? ds.length + (ds.length === 1 ? ' edit is' : ' edits are') + ' ready to send. Nothing has been sent or approved yet.'
+    : 'You’re looking over your website. Nothing has been sent or approved yet.';
+  const stepNow = justRevised ? 4 : blocked ? 3 : 1;
 
   return (
     <div className="screen review">
       <div className="review__bar">
-        <div className="review__title">
-          <div className="eyebrow">Step 3 of 4 · Website</div>
-          <h1 className="h1" tabIndex={-1} data-heading>Review your website.</h1>
-        </div>
-        <div className="row"><Badge icon="layers">Version {s.siteVersion}</Badge></div>
+        <h1 className="h1" tabIndex={-1} data-heading>Review your website.</h1>
+        <button className="btn btn--soft btn--sm" onClick={() => setDrawer(true)}><Icon name="edit" size={18} /> My edits <span className="badge badge--solid">{live.length}</span></button>
       </div>
+
+      <WebsiteSteps current={stepNow} text={statusText} version={s.siteVersion} />
 
       {s.flags.updatedBanner && s.changes.length > 0 && (
         <Banner tone="good" icon="checkCircle" title="Your website now includes your confirmed details.">
           {s.changes.length} update{s.changes.length === 1 ? '' : 's'} applied: {s.changes.slice(0, 3).map((c) => c.label).join(', ')}{s.changes.length > 3 ? ' and more' : ''}.
         </Banner>
       )}
-      {justRevised && <Banner tone="good" icon="checkCircle" title="Your team finished your edits.">Take another look. If it looks right, choose Looks good.</Banner>}
       {blocked && <Banner tone="warn" icon="clock" title="Your team is still working.">You can approve once your edits are ready. <button className="linkbtn" onClick={() => go({ stage: 'website', view: unresolved.length ? 'tracking' : 'updating' })}>See progress</button></Banner>}
 
-      {!s.flags.tourDismissed && !tourOpen && <div><button className="linkbtn" onClick={() => setTourOpen(true)}><Icon name="helpCircle" size={16} /> How does this work?</button></div>}
-      {!s.flags.tourDismissed && tourOpen && (
-        <div className="card card--tight tour" role="region" aria-label="Quick tour">
-          <div className="row" style={{ justifyContent: 'space-between' }}><b>How this works <span className="muted" style={{ fontWeight: 400 }}>(optional)</span></b>
-            <button className="linkbtn" onClick={() => mut((d) => { d.flags.tourDismissed = true; })}>Got it, hide this</button></div>
-          <ol>
-            <li><b>1</b><span><b>Look around.</b> Scroll your website just like a visitor would.</span></li>
-            <li><b>2</b><span><b>Choose Leave edits</b>, then click what you’d like changed.</span></li>
-            <li><b>3</b><span><b>Looks good?</b> Choose Looks good. You can skip edits entirely.</span></li>
-          </ol>
+      <div className={'howbar' + (mode === 'edit' ? ' is-edit' : '')} aria-live="polite">
+        <div className="howbar__txt">
+          {mode === 'edit'
+            ? <><span className="dot" /><span><b>Click anything you want changed.</b> A headline, a photo, a button. Then tell us what you’d like.</span></>
+            : <><Icon name="eye" size={20} /><span><b>Editing is paused.</b> Scroll and click around freely.</span></>}
         </div>
-      )}
-
-      <div className="review__bar">
-        {modeSeg}{devSeg}
-        <button className="btn btn--soft btn--sm" onClick={() => setDrawer(true)}><Icon name="edit" size={18} /> My edits <span className="badge" style={{ background: 'var(--cta)', color: '#fff' }}>{live.length}</span></button>
+        <div className="howbar__ctl">
+          <button className="linkbtn" onClick={() => { setMode(mode === 'edit' ? 'browse' : 'edit'); setDraft(null); }}>{mode === 'edit' ? 'Pause editing' : 'Resume editing'}</button>
+          {devSeg}
+        </div>
       </div>
 
       <div className={'stagebox' + (mode === 'edit' ? ' is-edit' : '')}>
-        <div className="modebanner" aria-live="polite">
-          {mode === 'edit' ? <><span className="dot" /> <b>Leave edits is on.</b> Click a headline, photo, or button to tell us what to change.</> : <><Icon name="eye" size={18} /> <b>You’re browsing.</b> Scroll and look around. Nothing you click here changes anything.</>}
-        </div>
         <SiteFrame device={device} site={site} mode={mode} edits={s.edits} selId={draft ? draft.id : selId} selLabel={draft ? draft.label : (s.edits.find((e) => e.id === selId) || {}).label} focusId={focusId}
           onPick={pick} onPin={openPin} />
       </div>
@@ -405,7 +393,7 @@ export function Review() {
         </Modal>
       )}
 
-      <ActionBar size="wide" msg={ds.length ? <><b>{ds.length} edit{ds.length === 1 ? '' : 's'}</b> ready to send. Sending edits doesn’t approve your website.</> : blocked ? <>Your team is working on your website.</> : <>Happy with it? Choose <b>Looks good</b>. Nothing goes live until you launch.</>}>
+      <ActionBar size="wide" msg={ds.length ? <><b>{ds.length} edit{ds.length === 1 ? '' : 's'}</b> ready. Sending them doesn’t approve your website.</> : blocked ? <>Your team is working on your website.</> : <>No changes needed? Choose <b>Looks good</b>.</>}>
         {ds.length > 0 ? (
           <>
             <button className="btn btn--ghost" disabled={blocked} onClick={approve}><Icon name="check" size={20} /> Looks good</button>

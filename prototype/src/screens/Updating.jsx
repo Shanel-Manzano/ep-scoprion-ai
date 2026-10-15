@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
 import { Head, Badge, Banner, ActionBar, Tick, Skip, Spinner, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
+import WebsiteSteps from '../ui/WebsiteSteps.jsx';
 import { useApp, finishUpdate, now } from '../store.jsx';
 
 // Applying confirmed details automatically, then opening the refreshed preview.
@@ -65,6 +66,7 @@ export function Updating() {
   return (
     <div className="screen main--narrow" style={{ margin: '0 auto' }}>
       <Head eyebrow="Step 3 of 4 · Website" title="We’re updating your website." lede="We’re applying your confirmed details before you review it. We’ll email you when it’s ready." />
+      <WebsiteSteps current={1} text="We’re getting your website ready. You’ll look it over next." version={s.siteVersion} />
 
       {q && (
         <div className="card card--accent" style={{ marginBottom: 20 }} role="group" aria-label="A question from your team">

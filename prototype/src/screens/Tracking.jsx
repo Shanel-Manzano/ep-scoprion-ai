@@ -3,6 +3,7 @@ import { Icon } from '../ui/Icons.jsx';
 import { Head, Badge, Banner, ActionBar, Skip, Tick, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import { EmailPreview } from '../ui/Emails.jsx';
 import { EditCard, StatusBadge } from './Review.jsx';
+import WebsiteSteps from '../ui/WebsiteSteps.jsx';
 import { useApp, drafts, sent, unresolvedSent, needsAnswer, teamEvent, now, rid, fmtTime } from '../store.jsx';
 
 // "Check your edits" before anything is sent.
@@ -37,7 +38,8 @@ export function SendReview() {
   }
   return (
     <div className="screen main--narrow" style={{ margin: '0 auto' }}>
-      <Head eyebrow="Step 3 of 4 · Website" title="Check your edits." lede="Look them over, then send them to your team. Sending edits doesn’t approve your website." />
+      <Head eyebrow="Step 3 of 4 · Website" title="Check your edits." lede="Look them over, then send them to your team." />
+      <WebsiteSteps current={2} text="Check your edits, then send them. Sending doesn’t approve your website." version={s.siteVersion} />
       <div className="stack">
         {ds.map((e) => (
           <EditCard key={e.id} e={e}
@@ -123,7 +125,9 @@ export function Tracking() {
   return (
     <div className="screen main--narrow" style={{ margin: '0 auto' }}>
       <Head eyebrow="Step 3 of 4 · Website" title={allReady ? 'Your updated website is ready.' : 'Your team is working on your edits.'}
-        lede={allReady ? 'Take another look. You can approve this version or ask for more changes.' : 'Each edit shows where it stands. If your team has a question, you can answer it right here.'} />
+        lede={allReady ? 'Take another look. You can approve this version or ask for more changes.' : 'Each edit shows where it stands. If your team has a question, answer it right here.'} />
+      <WebsiteSteps current={allReady ? 4 : 3} version={s.siteVersion}
+        text={qs.length ? 'Your team needs an answer from you before they can continue.' : allReady ? 'Your edits are done. Look them over, then approve.' : 'Your team is making your edits. We’ll email you when they’re ready.'} />
 
       {s.flags.justSent && !allReady && (
         <div style={{ marginBottom: 18 }}><Banner tone="good" icon="checkCircle" title={'Received. ' + s.flags.justSent + ' edit' + (s.flags.justSent === 1 ? '' : 's') + ' sent to your team.'}>Sending edits doesn’t approve your website. You’ll approve it after you see the changes.</Banner></div>
