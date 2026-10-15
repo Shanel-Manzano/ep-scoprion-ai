@@ -46,7 +46,7 @@ export function Topbar({ onHelp, onLater, tone, onToggleTheme }) {
           <ol className="tracker">
             {STAGES.map((st, i) => {
               const done = stageDone(s, st.key);
-              const active = stage === st.key;
+              const active = stage === st.key && !s.liveAt;
               const can = canGoStage(s, st.key) && !active;
               return (
                 <li key={st.key} className={'tstep' + (done ? ' is-done' : '') + (active ? ' is-active' : '')}>
@@ -68,7 +68,7 @@ export function Topbar({ onHelp, onLater, tone, onToggleTheme }) {
 
       <div className="topbar__right">
         {paid && <span className="saved" aria-live="polite" title="Your progress saves automatically"><Icon name={saving ? 'refresh' : 'checkCircle'} size={17} />{saving && <span>Saving…</span>}<span className="sr">{saving ? '' : 'Progress saved'}</span></span>}
-        {paid && !inPlatform && !['live', 'updating', 'applying', 'tracking'].includes(s.route.view) && (
+        {paid && !inPlatform && !s.liveAt && !['live', 'updating', 'applying', 'tracking'].includes(s.route.view) && (
           <button className="toplink" onClick={onLater}>Finish later</button>
         )}
         <button className="toplink toplink--strong" onClick={onHelp} aria-label="Help"><Icon name="helpCircle" size={18} /><span className="hide-sm"> Help</span></button>

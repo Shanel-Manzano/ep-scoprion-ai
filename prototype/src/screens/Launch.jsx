@@ -306,7 +306,7 @@ export function Publish() {
       <Head eyebrow="Step 4 of 4 · Launch" title={ok ? 'Your website is ready to publish at ' + domain + '.' : 'Almost ready to publish.'}
         lede={ok ? 'Everything is checked. When you choose Approve & launch, your website goes live.' : 'A few things still need you. Each one has a button to take care of it.'} />
       <div className="card">
-        <ul className="checklist">
+        <ul className="checklist checklist--grid">
           {checks.map((c) => (
             <li key={c.key}>
               <Tick state={c.ok ? 'done' : 'warn'} />
@@ -328,16 +328,21 @@ export function Publish() {
 export function Live() {
   const { s, go } = useApp();
   const [mail, setMail] = useState(false);
+  const [dev, setDev] = useState('desktop');
   const domain = s.launch.domain.choice === 'other' ? s.launch.domain.other : s.launch.domain.name;
   useHeadingFocus('live');
   return (
     <div className="screen center" style={{ gap: 20 }}>
       <div className="bigcheck"><Icon name="check" size={48} stroke={3} /></div>
       <h1 className="h1" tabIndex={-1} data-heading>Your website is live!</h1>
-      <div className="preview-live" style={{ width: '100%' }}>
+      <div className="seg" role="group" aria-label="Preview size">
+        <button className={dev === 'desktop' ? 'is-on' : ''} aria-pressed={dev === 'desktop'} onClick={() => setDev('desktop')}><Icon name="monitor" size={17} /> Computer</button>
+        <button className={dev === 'mobile' ? 'is-on' : ''} aria-pressed={dev === 'mobile'} onClick={() => setDev('mobile')}><Icon name="smartphone" size={17} /> Phone</button>
+      </div>
+      <div className={'preview-live' + (dev === 'mobile' ? ' is-phone' : '')} style={{ width: '100%' }}>
         <div className="livechip"><i /> Live</div>
         <div className="minisite__bar"><i /><i /><i /><span>{domain}</span></div>
-        <ScaledSite site={siteFromBiz(s.applied)} height={340} />
+        <ScaledSite site={siteFromBiz(s.applied)} height={dev === 'mobile' ? 420 : 340} device={dev} />
       </div>
       <a className="linkbox" href={'https://' + domain} onClick={(e) => e.preventDefault()}><Icon name="globe" size={22} /> {domain} <Icon name="external" size={18} /></a>
       <div className="card card--tight" style={{ maxWidth: 560, textAlign: 'left' }}>

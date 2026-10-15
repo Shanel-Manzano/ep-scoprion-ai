@@ -46,6 +46,14 @@ Sign up uses the dark AI MAX look (aurora purple). When payment succeeds and the
 
 One customer record (`src/store.jsx`) backs everything, saved to `localStorage`, so a refresh or return visit resumes at the next unfinished action and never asks twice.
 
+## Look and feel
+
+- **Sign up is dark (AI MAX), everything after is light (the platform).** The fade happens on the welcome screen. The light/dark toggle appears after Continue and is remembered.
+- **Status words and colours are the same everywhere:** In queue (orange), In progress (blue), Needs your answer (red), Complete (green). Cards with a Start button show no status until they are started or finished.
+- **The pizza tracker appears only for submitted edits.**
+- **Michelle appears from website review onward**, not at sign up.
+- The interface is scaled to 86% on larger screens to match the density of the platform.
+
 ## Prototype controls (bottom-left)
 
 A dark "Prototype controls" button opens a panel for reviewers:
@@ -58,6 +66,7 @@ A dark "Prototype controls" button opens a panel for reviewers:
 - choose the publish outcome: goes live, waiting on a dependency, or action needed
 - preview every email, the expired-link screen, and an old link opened after launch
 - hide the dashed "Prototype" skip-ahead shortcuts that appear on waiting screens
+- the "Next Confirm & Continue will" buttons do nothing on screen. They choose what happens when you next press Confirm & Continue on Details
 
 Test card: any number works. A number ending in `0002` is declined.
 

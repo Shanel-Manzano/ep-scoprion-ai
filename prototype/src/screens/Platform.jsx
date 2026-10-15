@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
-import { Head, Input, Select, Badge, Banner, Tick, Modal, useHeadingFocus } from '../ui/Primitives.jsx';
+import { Head, Input, Select, Check, Badge, Banner, Tick, Modal, useHeadingFocus } from '../ui/Primitives.jsx';
 import { TaskCard, Progress, Sheet } from '../ui/Cards.jsx';
 import { useApp, platformItems, now, fmtHours, fmtTime } from '../store.jsx';
 import { SOCIALS, CRM_OPTIONS, CLIENT } from '../data.js';
@@ -166,25 +166,22 @@ export function Platform({ onHelp }) {
             ))}
           </>}
           {open.key === 'crm' && <>
-            <p className="muted">Choosing a system is not the same as connecting it.</p>
-            <div className="optlist" role="radiogroup" aria-label="Business software">
-              {CRM_OPTIONS.map((o) => (
-                <button key={o} role="radio" aria-checked={p.crm.choice === o} className={'opt' + (p.crm.choice === o ? ' is-on' : '')}
-                  onClick={() => mut((d) => { d.platform.crm.choice = o; d.platform.crm.state = o === 'Other' ? 'none' : 'selected'; })}><span className="radio" />{o === 'Other' ? 'Something else' : o}</button>
+            <p className="muted">Where you keep track of people who contact you. Choosing one is not the same as connecting it.</p>
+            <div className="crmgrid" role="radiogroup" aria-label="Business software">
+              {CRM_OPTIONS.filter((o) => o !== 'Other').map((o) => (
+                <button key={o} role="radio" aria-checked={p.crm.choice === o} className={'crmtile' + (p.crm.choice === o ? ' is-on' : '')}
+                  onClick={() => { setOtherCrm(''); mut((d) => { d.platform.crm = { state: 'selected', choice: o, other: '' }; }); }}>{o}</button>
               ))}
-              <button role="radio" aria-checked={crmState === 'no_software'} className={'opt' + (crmState === 'no_software' ? ' is-on' : '')} onClick={() => mut((d) => { d.platform.crm = { state: 'no_software', choice: null, other: '' }; })}><span className="radio" />I don’t use any</button>
-              <button role="radio" aria-checked={crmState === 'deferred'} className={'opt' + (crmState === 'deferred' ? ' is-on' : '')} onClick={() => mut((d) => { d.platform.crm = { state: 'deferred', choice: null, other: '' }; })}><span className="radio" />I’ll decide later</button>
             </div>
-            {p.crm.choice === 'Other' && (
-              <div className="row">
-                <input className="input" style={{ flex: 1, minWidth: 200 }} aria-label="Your software" placeholder="What do you use?" value={otherCrm} onChange={(e) => setOtherCrm(e.target.value)} />
-                <button className="btn btn--soft" disabled={!otherCrm.trim()} onClick={() => mut((d) => { d.platform.crm.other = otherCrm.trim(); d.platform.crm.state = 'other'; })}>Save</button>
-              </div>
-            )}
+            <div className="ordline"><span>or</span></div>
+            <Input label="Tell us what you use" placeholder="For example, Pipedrive or a spreadsheet" value={otherCrm}
+              onChange={(e) => { setOtherCrm(e.target.value); mut((d) => { d.platform.crm = e.target.value.trim() ? { state: 'other', choice: 'Other', other: e.target.value.trim() } : { state: 'none', choice: null, other: '' }; }); }} />
+            <Check checked={crmState === 'no_software'} onChange={(e) => { setOtherCrm(''); mut((d) => { d.platform.crm = e.target.checked ? { state: 'no_software', choice: null, other: '' } : { state: 'none', choice: null, other: '' }; }); }}>I don’t use a CRM or business software</Check>
             {crmState === 'selected' && <div className="banner banner--warn"><Icon name="plug" size={22} /><div><b>{p.crm.choice} is chosen, but not connected yet.</b>Connect it so inquiries can flow into it.<div style={{ marginTop: 10 }}><button className="btn btn--primary btn--sm" onClick={() => setFlow({ crm: true })}><Icon name="plug" size={18} /> Connect {p.crm.choice}</button></div></div></div>}
             {crmState === 'other' && <Banner tone="warn" icon="info" title="Noted. It isn’t connected.">We’ll let you know if AI MAX can connect to {p.crm.other}.</Banner>}
             {crmState === 'connected' && <Banner tone="good" icon="checkCircle" title={p.crm.choice + ' is connected.'} />}
             {crmState === 'deferred' && <Banner icon="clock" title="No problem.">Come back when you’re ready.</Banner>}
+            {crmState !== 'connected' && crmState !== 'deferred' && <div><button className="linkbtn" onClick={() => { setOtherCrm(''); mut((d) => { d.platform.crm = { state: 'deferred', choice: null, other: '' }; }); setSheet(null); }}>Skip this step for now</button></div>}
           </>}
           {open.key === 'revenue' && <>
             <p className="muted">A goal helps AI MAX show your progress in plain numbers.</p>

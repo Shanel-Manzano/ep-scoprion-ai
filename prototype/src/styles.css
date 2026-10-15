@@ -1042,3 +1042,17 @@ button.chip:hover { border-color: var(--accent); }
 .is-queue .ptrack__dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--st-queue); }
 .is-queue .ptrack__l { color: var(--st-queue); font-weight: 600; }
 .is-queue::before { background: var(--st-done); }
+
+/* ===== publish checklist, live preview, business-software tiles ===== */
+.checklist--grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+.checklist--grid li { padding: 12px 0; }
+@media (max-width: 760px) { .checklist--grid { grid-template-columns: 1fr; } }
+.preview-live.is-phone { max-width: 330px; }
+.preview-live.is-phone .minisite__bar { display: none; }
+.crmgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.crmtile { min-height: 64px; border-radius: 14px; border: 1px solid var(--cardline); background: var(--card); font-size: 16px; font-weight: 500; color: var(--ink); cursor: pointer; padding: 10px; transition: border-color .15s, background .15s; }
+.crmtile:hover { border-color: var(--accent); }
+.crmtile.is-on { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent); font-weight: 600; }
+.ordline { display: flex; align-items: center; gap: 14px; color: var(--ink2); font-size: 13px; text-transform: uppercase; letter-spacing: .12em; }
+.ordline::before, .ordline::after { content: ""; flex: 1; height: 1px; background: var(--cardline); }
+@media (max-width: 560px) { .crmgrid { grid-template-columns: 1fr 1fr; } }
