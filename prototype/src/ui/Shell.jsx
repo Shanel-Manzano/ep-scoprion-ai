@@ -67,16 +67,16 @@ export function Topbar({ onHelp, onLater, tone, onToggleTheme }) {
       )}
 
       <div className="topbar__right">
-        {paid && <span className="saved" aria-live="polite"><Icon name={saving ? 'refresh' : 'checkCircle'} size={17} /><span>{saving ? 'Saving…' : 'Progress saved'}</span></span>}
+        {paid && <span className="saved" aria-live="polite" title="Your progress saves automatically"><Icon name={saving ? 'refresh' : 'checkCircle'} size={17} />{saving && <span>Saving…</span>}<span className="sr">{saving ? '' : 'Progress saved'}</span></span>}
         {paid && !inPlatform && s.route.view !== 'live' && (
-          <button className="toplink" onClick={onLater}><Icon name="save" size={16} /> <span className="hide-sm">Finish later</span></button>
+          <button className="toplink" onClick={onLater}>Finish later</button>
         )}
-        <button className="toplink toplink--strong" onClick={onHelp}><Icon name="helpCircle" size={17} /> <span className="hide-sm">Help</span></button>
-        {paid && <span className="locchip"><Icon name="mapPin" size={16} /> {CLIENT.firm}</span>}
+        <button className="toplink toplink--strong" onClick={onHelp} aria-label="Help"><Icon name="helpCircle" size={18} /><span className="hide-sm"> Help</span></button>
         <button className="themebtn" onClick={onToggleTheme} aria-label={tone === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={tone === 'dark' ? 'Light mode' : 'Dark mode'}>
           <Icon name={tone === 'dark' ? 'sun' : 'moon'} size={18} />
         </button>
-        {paid && <span className="avatar" aria-hidden="true">{initials}</span>}
+        {inPlatform && <span className="locchip"><Icon name="mapPin" size={16} /> {CLIENT.firm}</span>}
+        {inPlatform && <span className="avatar" aria-hidden="true">{initials}</span>}
       </div>
       <div className="mprog">
         {inPlatform
