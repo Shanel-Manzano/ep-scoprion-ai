@@ -912,3 +912,10 @@ button.chip:hover { border-color: var(--accent); }
 .brand__aimax { font-family: var(--font-display); font-weight: 300; font-size: 25px; letter-spacing: -.02em; color: #fff; line-height: 1; margin-top: 1px; }
 .brand__aimax b { font-weight: 700; background: linear-gradient(180deg, #8f6cff 0%, #2f8bff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .app[data-brand="aimax"] .topbar { min-height: 76px; }
+
+/* ===== scale: denser, closer to the platform (about 86% on larger screens) ===== */
+@media (min-width: 761px) {
+  .app { zoom: .86; min-height: calc(100vh / .86); }
+  .su { min-height: 0; }
+}
+@media (min-width: 761px) { .app .stagebox { zoom: calc(1 / .86); } }
