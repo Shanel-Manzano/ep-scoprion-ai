@@ -50,3 +50,22 @@ export function Sheet({ title, icon, onClose, doneLabel = 'Done', onDone, childr
     </>
   );
 }
+
+// Compact confirm tile: what we know, then one yes or a change.
+export function DetailTile({ icon, title, checked, children, onYes, onChange }) {
+  return (
+    <section className={'dtile' + (checked ? ' is-checked' : '')}>
+      <header className="dtile__head">
+        <span className="dtile__ico"><Icon name={icon} size={20} /></span>
+        <h2 className="dtile__t">{title}</h2>
+      </header>
+      <div className="dtile__body">{children}</div>
+      <footer className="dtile__act">
+        {checked
+          ? <span className="dtile__ok"><Icon name="check" size={16} stroke={3} /> Looks right</span>
+          : <button className="dtile__yes" onClick={onYes}><span className="dtile__circle" /> Looks right</button>}
+        <button className="linkbtn" onClick={onChange}>Change</button>
+      </footer>
+    </section>
+  );
+}

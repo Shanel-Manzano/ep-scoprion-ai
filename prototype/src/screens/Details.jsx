@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
 import { Head, Input, Select, Check, Toggle, Banner, ActionBar, useHeadingFocus } from '../ui/Primitives.jsx';
-import { TaskCard, Progress, Sheet } from '../ui/Cards.jsx';
+import { DetailTile, Progress, Sheet } from '../ui/Cards.jsx';
 import { useApp, diffBiz, planUpdate, now, fmtHours, fmtTime, rid, clone } from '../store.jsx';
 import { TIMEZONES, TIMES, SERVICE_SUGGESTIONS } from '../data.js';
 
@@ -58,14 +58,11 @@ export function DetailsForm() {
   const loc0 = b.locations[0];
   const summaries = {
     biz: <b>{b.name}</b>,
-    loc: <>
-      {b.locations.map((l) => <div key={l.id}><b>{l.label}</b><div className="dim">{addrLine(l)}</div><div className="dim">{l.showAddress ? 'Shown on your website' : 'Not shown publicly'}</div></div>)}
-      <div className="dim">Areas you serve: {b.serviceAreas.join(', ') || 'None yet'}</div>
-    </>,
-    contact: <><b>{b.phone}</b><div className="dim">{b.showPhone ? 'Shown on your website' : 'Hidden'}</div><b style={{ marginTop: 8, display: 'block' }}>{b.email}</b><div className="dim">{b.showEmail ? 'Shown on your website' : 'Hidden'}</div></>,
-    hours: <>{b.locations.map((l) => <div key={l.id}>{b.locations.length > 1 && <b>{l.label}</b>}<div>Mon to Fri: <b>{fmtHours(l.hours.weekdays)}</b></div><div className="dim">Sat: {fmtHours(l.hours.sat)} · Sun: {fmtHours(l.hours.sun)} · {l.tz} time</div></div>)}</>,
-    svc: <><div>{b.services.map((x) => x.name).join(', ')}</div><div className="dim">{b.services.filter((x) => x.priority).length ? 'Featured: ' + b.services.filter((x) => x.priority).map((x) => x.name).join(', ') : 'Nothing featured yet'}</div></>,
-    team: b.team.map((t) => <div key={t.id}><b>{t.name}</b><div className="dim">{t.cred}</div></div>),
+    loc: <><b>{loc0.label}</b><div className="dim">{loc0.street}{loc0.suite ? ', ' + loc0.suite : ''}</div><div className="dim">{b.locations.length > 1 ? '+ ' + (b.locations.length - 1) + ' more · ' : ''}{b.serviceAreas.length} areas served</div></>,
+    contact: <><b>{b.phone}</b><div className="dim">{b.email}</div></>,
+    hours: <><b>Mon to Fri {fmtHours(loc0.hours.weekdays)}</b><div className="dim">Sat {fmtHours(loc0.hours.sat)} · Sun {fmtHours(loc0.hours.sun)}</div></>,
+    svc: <><b>{b.services.length} practice areas</b><div className="dim">{b.services.filter((x) => x.priority).map((x) => x.name).join(', ') || b.services.slice(0, 2).map((x) => x.name).join(', ')}</div></>,
+    team: <><b>{b.team.map((t) => t.name).join(', ')}</b><div className="dim">{b.team.length} on your website</div></>,
   };
 
   const editors = {
@@ -167,28 +164,22 @@ export function DetailsForm() {
   const open = CARDS.find((c) => c.key === sheet);
   return (
     <div className="screen">
-      <Head eyebrow="Step 2 of 4 · Details" title="Confirm your business details." lede="We’ve filled in what we know. Check each box below.">
+      <Head eyebrow="Step 2 of 4 · Details" title="Confirm your business details." lede="We’ve filled in what we know. Confirm each one, or change what isn’t right.">
         {s.confirmedAt && <div style={{ marginTop: 16 }}><Banner tone="good" icon="checkCircle" title={'Confirmed ' + fmtTime(s.confirmedAt) + '.'}>You can change anything and confirm again.</Banner></div>}
       </Head>
 
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div className="grow" style={{ minWidth: 240 }}><Progress done={doneCount} total={CARDS.length} label={doneCount + ' of ' + CARDS.length + ' checked'} /></div>
-        {!all && <button className="btn btn--ghost btn--sm" style={{ marginBottom: 26 }} onClick={markAll}><Icon name="check" size={18} /> Everything looks right</button>}
+        {!all && <button className="btn btn--tint btn--sm" style={{ marginBottom: 26 }} onClick={markAll}><Icon name="check" size={18} stroke={3} /> Everything looks right</button>}
       </div>
 
-      <div className="tgrid">
-        {CARDS.map((c) => {
-          const done = !!reviewed[c.key];
-          const chg = changedIn(c.changed);
-          return (
-            <TaskCard key={c.key} icon={c.icon} title={c.title} status={done ? 'done' : 'todo'} badge={done ? (chg ? 'Changed' : 'Looks right') : 'Please check'}
-              actions={done
-                ? <button className="btn btn--ghost btn--sm" onClick={() => setSheet(c.key)}>Change</button>
-                : <><button className="btn btn--ghost btn--sm" onClick={() => mark(c.key)}><Icon name="check" size={16} /> Looks right</button><button className="linkbtn" onClick={() => setSheet(c.key)}>Change</button></>}>
-              {summaries[c.key]}
-            </TaskCard>
-          );
-        })}
+      <div className="dgrid">
+        {CARDS.map((c) => (
+          <DetailTile key={c.key} icon={c.icon} title={c.title} checked={!!reviewed[c.key]}
+            onYes={() => mark(c.key)} onChange={() => setSheet(c.key)}>
+            {summaries[c.key]}
+          </DetailTile>
+        ))}
       </div>
 
       {err && <div style={{ marginTop: 18 }}><Banner tone="bad" icon="alert">{err}</Banner></div>}

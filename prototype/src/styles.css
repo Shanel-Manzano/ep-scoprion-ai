@@ -722,3 +722,28 @@ button.chip:hover { border-color: var(--accent); }
   .su { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "card" "preview" "plan"; max-width: 640px; row-gap: 32px; }
 }
 .demo--low { bottom: 14px; }
+
+/* ================= screen 2: confirm details, compact tiles ================= */
+.btn--tint { background: var(--accent-soft); color: var(--accent); border: 1px solid #c5d3f6; font-weight: 700; }
+.app[data-tone="light"] .btn--tint { background: #e6eeff; border-color: #b9ccf7; color: #1f4fbf; }
+.btn--tint:hover:not(:disabled) { background: #dbe7ff; }
+.dgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.dtile { display: flex; flex-direction: column; gap: 14px; padding: 26px 26px 22px; background: var(--card); border: 1px solid var(--cardline); border-radius: 18px; min-width: 0; transition: border-color .25s, background .25s; }
+.dtile.is-checked { border-color: #cfe9de; background: #f6fbf9; }
+.dtile__head { display: flex; align-items: center; gap: 12px; }
+.dtile__ico { width: 36px; height: 36px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex: none; }
+.dtile.is-checked .dtile__ico { background: var(--good-soft); color: var(--good); }
+.dtile__t { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.dtile__body { flex: 1; font-size: 15px; color: var(--ink); line-height: 1.5; display: grid; gap: 2px; align-content: start; min-height: 66px; }
+.dtile__body b { font-weight: 600; }
+.dtile__body .dim { color: var(--ink2); font-size: 14px; overflow-wrap: anywhere; }
+.dtile__act { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px solid var(--cardline); }
+.dtile.is-checked .dtile__act { border-top-color: #dcefe6; }
+.dtile__yes { display: inline-flex; align-items: center; gap: 9px; background: none; border: 0; padding: 4px 0; font-size: 14.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.dtile__circle { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--fieldline); display: inline-block; transition: border-color .15s, background .15s; }
+.dtile__yes:hover .dtile__circle { border-color: var(--good); background: var(--good-soft); }
+.dtile__ok { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 600; color: var(--good); }
+.dtile__ok svg { background: var(--good); color: #fff; border-radius: 50%; padding: 3px; width: 20px; height: 20px; box-sizing: border-box; }
+@media (max-width: 1100px) { .dgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .dgrid { grid-template-columns: minmax(0, 1fr); } }
+.main--mid { max-width: 1180px; }

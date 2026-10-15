@@ -201,8 +201,7 @@ export function Welcome() {
   useHeadingFocus('welcome');
   useEffect(() => {
     const a = setTimeout(() => setWelcomeLight(true), 1200); // the slow fade into the lighter platform tone
-    const b = setTimeout(() => { if (!left.current) next(); }, 6200);
-    return () => { clearTimeout(a); clearTimeout(b); };
+    return () => clearTimeout(a);
   }, []); // eslint-disable-line
   function next() { left.current = true; setWelcomeLight(false); go({ stage: 'details', view: 'form' }); }
   return (
