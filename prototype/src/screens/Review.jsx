@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icons.jsx';
-import WebsiteSteps from '../ui/WebsiteSteps.jsx';
 import { Head, Badge, Banner, ActionBar, Modal, Person, useHeadingFocus } from '../ui/Primitives.jsx';
 import RooSite from '../site/RooSite.jsx';
 import { useApp, siteFromBiz, drafts, sent, pendingUpdate, unresolvedSent, now, rid } from '../store.jsx';
-import { REQUEST_TYPES, CLIENT } from '../data.js';
+import { REQUEST_TYPES, CLIENT, PM } from '../data.js';
 
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const typeMeta = (id) => REQUEST_TYPES.find((t) => t.id === id) || REQUEST_TYPES[2];
@@ -331,49 +330,62 @@ export function Review() {
     window.scrollTo(0, 0);
   }
 
+  const [tip, setTip] = useState(false);
   const devSeg = (
     <div className="seg" role="group" aria-label="Preview size">
-      <button className={device === 'desktop' ? 'is-on' : ''} aria-pressed={device === 'desktop'} onClick={() => setDevice('desktop')}><Icon name="monitor" size={18} /> Computer</button>
-      <button className={device === 'mobile' ? 'is-on' : ''} aria-pressed={device === 'mobile'} onClick={() => setDevice('mobile')}><Icon name="smartphone" size={18} /> Phone</button>
+      <button className={device === 'desktop' ? 'is-on' : ''} aria-pressed={device === 'desktop'} onClick={() => setDevice('desktop')}><Icon name="monitor" size={17} /> Computer</button>
+      <button className={device === 'mobile' ? 'is-on' : ''} aria-pressed={device === 'mobile'} onClick={() => setDevice('mobile')}><Icon name="smartphone" size={17} /> Phone</button>
     </div>
   );
-  const statusText = justRevised ? 'Your team finished your edits. Look them over, then choose Looks good.'
+  const statusText = justRevised ? 'Your team finished your edits. Take another look.'
     : blocked ? 'Your team is still working. You can approve once they finish.'
-    : ds.length ? ds.length + (ds.length === 1 ? ' edit is' : ' edits are') + ' ready to send. Nothing has been sent or approved yet.'
-    : 'You’re looking over your website. Nothing has been sent or approved yet.';
-  const stepNow = justRevised ? 4 : blocked ? 3 : 1;
+    : ds.length ? ds.length + (ds.length === 1 ? ' edit is' : ' edits are') + ' saved. Nothing is sent until you choose.' : '';
+  const says = justRevised ? 'Your edits are done. Take a look, and if it’s right, choose Looks good.'
+    : blocked ? 'I’m working on your edits. I’ll email you the moment they’re ready.'
+    : ds.length ? 'Ready? Send your edits and I’ll get started.'
+    : 'Click anything you’d like changed. I’ll take it from there.';
 
   return (
     <div className="screen review">
-      <div className="review__bar">
-        <h1 className="h1" tabIndex={-1} data-heading>Review your website.</h1>
-        <button className="btn btn--soft btn--sm" onClick={() => setDrawer(true)}><Icon name="edit" size={18} /> My edits <span className="badge badge--solid">{live.length}</span></button>
-      </div>
-
-      <WebsiteSteps current={stepNow} text={statusText} version={s.siteVersion} />
-
-      {s.flags.updatedBanner && s.changes.length > 0 && (
-        <Banner tone="good" icon="checkCircle" title="Your website now includes your confirmed details.">
-          {s.changes.length} update{s.changes.length === 1 ? '' : 's'} applied: {s.changes.slice(0, 3).map((c) => c.label).join(', ')}{s.changes.length > 3 ? ' and more' : ''}.
-        </Banner>
-      )}
-      {blocked && <Banner tone="warn" icon="clock" title="Your team is still working.">You can approve once your edits are ready. <button className="linkbtn" onClick={() => go({ stage: 'website', view: unresolved.length ? 'tracking' : 'updating' })}>See progress</button></Banner>}
-
-      <div className={'howbar' + (mode === 'edit' ? ' is-edit' : '')} aria-live="polite">
-        <div className="howbar__txt">
-          {mode === 'edit'
-            ? <><span className="dot" /><span><b>Click anything you want changed.</b> A headline, a photo, a button. Then tell us what you’d like.</span></>
-            : <><Icon name="eye" size={20} /><span><b>Editing is paused.</b> Scroll and click around freely.</span></>}
+      <div className="rv">
+        <div className="rv__head">
+          <div className="rv__title">
+            <div className="eyebrow">Step 3 of 4 · Website · Version {s.siteVersion}</div>
+            <h1 className="h1" tabIndex={-1} data-heading>Review your website.</h1>
+            <p className="rv__ask">
+              <b>Click anything you want changed.</b> Or if it looks right, choose Looks good.
+              <span className="tipwrap">
+                <button className="tipbtn" onClick={() => setTip(!tip)} aria-expanded={tip} aria-label="What should I look for?"><Icon name="info" size={16} /> What to look for</button>
+                {tip && (
+                  <span className="tippop" role="note">
+                    <button className="tippop__x" onClick={() => setTip(false)} aria-label="Close"><Icon name="x" size={14} /></button>
+                    <span><b>Does it sound like you?</b> Change any words that don’t.</span>
+                    <span><b>Got your own photos?</b> Real ones beat stock.</span>
+                    <span><b>Is the phone number right?</b> It’s a tracking number that rings you.</span>
+                  </span>
+                )}
+              </span>
+            </p>
+            {statusText && <p className="rv__status">{statusText}</p>}
+          </div>
+          <div className="rv__ctl">
+            {devSeg}
+            <button className="btn btn--soft btn--sm" onClick={() => setDrawer(true)}><Icon name="edit" size={17} /> My edits <span className="badge badge--solid">{live.length}</span></button>
+          </div>
         </div>
-        <div className="howbar__ctl">
-          <button className="linkbtn" onClick={() => { setMode(mode === 'edit' ? 'browse' : 'edit'); setDraft(null); }}>{mode === 'edit' ? 'Pause editing' : 'Resume editing'}</button>
-          {devSeg}
-        </div>
-      </div>
 
-      <div className={'stagebox' + (mode === 'edit' ? ' is-edit' : '')}>
-        <SiteFrame device={device} site={site} mode={mode} edits={s.edits} selId={draft ? draft.id : selId} selLabel={draft ? draft.label : (s.edits.find((e) => e.id === selId) || {}).label} focusId={focusId}
-          onPick={pick} onPin={openPin} />
+        {s.flags.updatedBanner && s.changes.length > 0 && (
+          <Banner tone="good" icon="checkCircle" title="Your website now includes your confirmed details.">
+            {s.changes.length} update{s.changes.length === 1 ? '' : 's'} applied: {s.changes.slice(0, 3).map((c) => c.label).join(', ')}{s.changes.length > 3 ? ' and more' : ''}.
+          </Banner>
+        )}
+        {blocked && <Banner tone="warn" icon="clock" title="Your team is still working.">You can approve once your edits are ready. <button className="linkbtn" onClick={() => go({ stage: 'website', view: unresolved.length ? 'tracking' : 'updating' })}>See progress</button></Banner>}
+
+        <div className="stagebox is-edit">
+          <SiteFrame device={device} site={site} mode={mode} edits={s.edits} selId={draft ? draft.id : selId} selLabel={draft ? draft.label : (s.edits.find((e) => e.id === selId) || {}).label} focusId={focusId}
+            onPick={pick} onPin={openPin} />
+          {!draft && <div className="editpill" aria-hidden="true"><span className="dot" /><b>Edit mode</b><span>Click a headline or photo to leave a note</span></div>}
+        </div>
       </div>
 
       {draft && <Composer draft={draft} setDraft={setDraft} onSave={saveDraft} onCancel={() => { setDraft(null); setSelId(null); }} onDelete={() => del(draft.id)} />}
@@ -393,15 +405,13 @@ export function Review() {
         </Modal>
       )}
 
-      <ActionBar size="wide" msg={ds.length ? <><b>{ds.length} edit{ds.length === 1 ? '' : 's'}</b> ready. Sending them doesn’t approve your website.</> : blocked ? <>Your team is working on your website.</> : <>No changes needed? Choose <b>Looks good</b>.</>}>
-        {ds.length > 0 ? (
-          <>
-            <button className="btn btn--ghost" disabled={blocked} onClick={approve}><Icon name="check" size={20} /> Looks good</button>
-            <button className="btn btn--primary" onClick={() => go({ stage: 'website', view: 'send' })}>Send to my team <Icon name="arrowRight" size={20} /></button>
-          </>
-        ) : (
-          <button className="btn btn--primary" disabled={blocked} onClick={approve}><Icon name="check" size={20} /> Looks good</button>
-        )}
+      <ActionBar size="wide" msg={
+        <div className="says">
+          <img className="says__av" src={PM.photo} alt="" width="44" height="44" />
+          <div><span className="says__k">{PM.first} says</span><div className="says__t">{says}</div></div>
+        </div>}>
+        {ds.length > 0 && <button className="btn btn--tint" onClick={() => go({ stage: 'website', view: 'send' })}><Icon name="send" size={18} /> Send {ds.length} edit{ds.length === 1 ? '' : 's'}</button>}
+        <button className="btn btn--primary btn--lg" disabled={blocked} onClick={approve}><Icon name="check" size={20} stroke={3} /> Looks good</button>
       </ActionBar>
     </div>
   );
