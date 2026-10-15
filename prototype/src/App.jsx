@@ -52,7 +52,7 @@ function Shell() {
   const [pref, setPref] = useState(() => { try { return localStorage.getItem('aimax-theme') || ''; } catch (e) { return ''; } });
   const dark = stage === 'signup' && view !== 'welcome';
   const auto = view === 'welcome' && stage === 'signup' ? (welcomeLight ? 'light' : 'dark') : dark ? 'dark' : 'light';
-  const tone = pref || auto;
+  const tone = stage === 'signup' ? auto : (pref || auto); // the sign-up story is always dark, then fades to light
   const toggleTheme = () => { const n = tone === 'dark' ? 'light' : 'dark'; setPref(n); try { localStorage.setItem('aimax-theme', n); } catch (e) { /* noop */ } };
   const wide = stage === 'website' && (view === 'review' || !view);
   const bleed = stage === 'signup' && (view === 'form' || !view);

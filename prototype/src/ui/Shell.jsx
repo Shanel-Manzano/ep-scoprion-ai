@@ -72,9 +72,9 @@ export function Topbar({ onHelp, onLater, tone, onToggleTheme }) {
           <button className="toplink" onClick={onLater}>Finish later</button>
         )}
         <button className="toplink toplink--strong" onClick={onHelp} aria-label="Help"><Icon name="helpCircle" size={18} /><span className="hide-sm"> Help</span></button>
-        <button className="themebtn" onClick={onToggleTheme} aria-label={tone === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={tone === 'dark' ? 'Light mode' : 'Dark mode'}>
+        {stage !== 'signup' && <button className="themebtn" onClick={onToggleTheme} aria-label={tone === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={tone === 'dark' ? 'Light mode' : 'Dark mode'}>
           <Icon name={tone === 'dark' ? 'sun' : 'moon'} size={18} />
-        </button>
+        </button>}
         {inPlatform && <span className="locchip"><Icon name="mapPin" size={16} /> {CLIENT.firm}</span>}
         {inPlatform && <span className="avatar" aria-hidden="true">{initials}</span>}
       </div>
